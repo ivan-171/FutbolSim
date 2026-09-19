@@ -1,0 +1,79 @@
+LeagueForge VM — Validation Report
+
+BUILD
+- Product: LeagueForge VM (mobile-first PWA)
+- Target: iPhone / iOS, GitHub Pages
+- No external backend required
+- No Supabase required
+- No paid dependency required
+
+FILES
+- index.html
+- manifest.webmanifest
+- sw.js
+- .nojekyll
+- icons/icon-192.png
+- icons/icon-512.png
+- icons/apple-touch-icon.png
+- README_GITHUB_PAGES.md
+
+FUNCTIONAL VALIDATION
+- Core LeagueForge v5 suite: 60/60 PASS
+- VM-specific suite: 8/8 PASS
+- JavaScript syntax: PASS
+- Service Worker syntax: PASS
+- Manifest JSON parse: PASS
+- DOM IDs: 143 / 143 unique
+- PWA icon dimensions: PASS (192, 512, 180)
+
+VM-SPECIFIC TESTS
+1. No viewport-wide horizontal overflow in the mobile harness.
+2. Bottom navigation exists and is fixed.
+3. Visible controls meet the VM minimum touch-height test.
+4. Desktop sidebar is hidden.
+5. Mobile “More” sheet exists.
+6. IndexedDB save/read round-trip passes with the browser API harness.
+7. Service Worker API is supported in the PWA harness.
+8. Service Worker registration path resolves in the harness.
+
+MOBILE UX
+- iPhone safe-area support
+- Fixed five-item bottom navigation
+- Secondary navigation in a “More” bottom sheet
+- Single-column dashboard
+- Compact mobile standings instead of the desktop wide table
+- Vertical player cards
+- Vertical transfer cards
+- Horizontally swipeable club and draft card strips
+- Large match-result reveal retained
+- Responsive setup/history/records layouts
+- iOS-friendly 16px form controls to avoid unwanted Safari zoom
+- PWA install guidance for iPhone
+- Portrait-first layout with landscape fallback
+
+PERSISTENCE
+- Primary mobile save: IndexedDB
+- localStorage fallback/mirror remains for compatibility
+- Autosave on important game actions
+- Autosave when app moves to background / pagehide
+- Manual save
+- Rolling local snapshots
+- Export JSON backup
+- Import JSON compatible with LeagueForge desktop v5
+- Attempts navigator.storage.persist() where supported
+
+OFFLINE
+- Service Worker caches the app shell and icons.
+- Navigation falls back to cached index.html.
+- After the first successful online load, the app can reopen offline.
+
+BROWSER-AUTOMATION NOTE
+The Chromium binary in this execution environment hangs even on a minimal data: page,
+so a genuine WebKit/iOS or Chromium graphical automation run could not be completed here.
+The build was instead validated with:
+- the exact game JavaScript in a simulated DOM harness,
+- an IndexedDB/Service Worker API harness,
+- static 390px mobile rendering,
+- source/manifest/service-worker validation.
+A real iPhone smoke test after publishing to GitHub Pages is still recommended because
+only iOS Safari/WebKit can fully validate Home Screen installation and safe-area behavior.
