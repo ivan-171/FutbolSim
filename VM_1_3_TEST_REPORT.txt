@@ -1,0 +1,72 @@
+LeagueForge VM 1.3 — Validation Report
+
+FINAL SUITES
+- Core engine: 60/60 PASS
+- VM 1.1 economy/market regression: 9/9 PASS
+- VM 1.2 draft regression: 8/8 PASS
+- VM 1.3 economy/stagnation/market: 7/7 PASS
+- TOTAL: 84/84 PASS
+- JavaScript syntax: PASS
+- Service Worker syntax: PASS
+- Manifest JSON: PASS
+
+MOBILE LAYOUT
+- 320 px viewport: document width 320 / 320, no horizontal overflow
+- 390 px viewport: document width 390 / 390, no horizontal overflow
+- 430 px viewport: document width 430 / 430, no horizontal overflow
+- Mobile bottom navigation present at all three widths
+- Desktop sidebar hidden at all three widths
+
+MARKET V1.3
+- Max incoming: 5 per club; promoted club: 6
+- Max outgoing: 5 per club
+- Position and total roster floors remain hard constraints
+- Full-position signings replace the weakest incumbent immediately; the incoming player is retained
+- Automatic market resolves already-pending offers before generating more
+- Final calibration: 2 negotiation waves + additional opportunities
+
+5 UNIVERSES × 30 SEASONS
+- Average transfers per summer: 49.39
+- Typical summer range: 45–52 completed transfers
+- Approx. 3.1 incoming moves per club per summer on average, with room to reach the 5/6 cap
+- Roster/position violations: 0 across 150 simulated seasons
+- Free-agent pool remained bounded below the configured pruning ceiling
+
+ECONOMY V1.3
+- Hard treasury cap: 135M
+- D1 prize band: 24–48M
+- D2 prize band: 12–28M
+- Promotion bonus: 8M
+- Relegation support: 7M
+- Cup winner: 9M
+- Cup finalist: 4M
+- Squad operating cost scales with squad player value
+- Luxury cost activates on especially valuable squads
+- Progressive treasury carrying cost activates above 65M
+- Migration from older economy normalizes already-inflated budgets once, proportionally
+
+5 × 30-SEASON ECONOMY STRESS
+- Average final-season median budget: 91.37M
+- Average final-season maximum budget: 133.2M
+- Cap observations: 42 / 2400 club-seasons (~1.75%)
+- No runaway-budget failure
+- No roster failure
+
+STAGNATION WARNING
+- Trigger: 7 consecutive completed seasons in D2 without a top-4 finish
+- A D2 top-4 finish resets the streak
+- A return to D1 resets the streak
+- UI shows “Crisis institucional” with exact streak
+- Warning is informational only: no hidden boost or rubber-banding
+
+ROSTER / FREE AGENTS
+- Position minimums are restored immediately after retirements, before the market
+- Free agents age and are pruned so the pool cannot grow without bound
+- Roster rules remain: POR 2–3, DEF 5–8, MED 5–8, DEL 3–6, total 18–25
+
+SAVE COMPATIBILITY
+- Save schema: 5.3 / client VM1.3
+- Same IndexedDB origin as VM 1.2
+- Existing VM 1.2 save remains loadable when deployed at the same GitHub Pages URL
+- Autosave + manual + two compact checkpoints retained
+- Service Worker cache bumped to leagueforge-vm-v1-3

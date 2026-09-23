@@ -1,33 +1,58 @@
-# LeagueForge VM — instalación en GitHub Pages
+# LeagueForge VM 1.3 — Balance de economía y mercado
 
-## Qué necesitas
-- Una cuenta gratuita de GitHub.
-- Un repositorio **público** si usas GitHub Free.
-- No necesitas Supabase, Node, Xcode ni ninguna cuenta adicional.
+## Mantener tu partida actual
+VM 1.3 es compatible con VM 1.2. Si sustituyes los archivos en el **mismo repo de GitHub Pages y mantienes la misma URL**, IndexedDB sigue siendo el mismo y la partida local permanece.
 
-## Subirlo
-1. Crea un repositorio, por ejemplo `leagueforge-mobile`.
-2. Sube **el contenido de esta carpeta** a la raíz del repo: `index.html`, `manifest.webmanifest`, `sw.js` y la carpeta `icons`.
-3. En GitHub: **Settings → Pages**.
-4. En “Build and deployment”, selecciona **Deploy from a branch**.
-5. Branch: `main`, carpeta: `/ (root)`, y guarda.
-6. GitHub te dará una URL similar a `https://TUUSUARIO.github.io/leagueforge-mobile/`.
+Antes de actualizar, por prudencia: **Historia → Exportar JSON → guardar en Archivos/iCloud**.
 
-## Instalar en iPhone
-1. Abre esa URL en **Safari**.
-2. Pulsa **Compartir**.
-3. Pulsa **Añadir a pantalla de inicio**.
-4. Ábrelo desde el nuevo icono “LeagueForge”. Se ejecutará como una web app independiente.
+## Actualización
+1. Descomprime el ZIP.
+2. Sustituye en el repo los archivos anteriores por los de `LeagueForge_VM_1_3`.
+3. Commit + push.
+4. Espera al deploy de GitHub Pages.
+5. Cierra y vuelve a abrir la PWA si iOS mantiene unos segundos la versión antigua.
 
-## Guardado
-- El guardado principal usa **IndexedDB**, una base de datos incorporada en Safari. No instalas nada.
-- Se hace autosave tras acciones importantes y al mandar la app a segundo plano.
-- La VM conserva varios snapshots locales.
-- `Exportar JSON` crea un backup portable que puedes guardar en Archivos/iCloud.
-- `Importar JSON` restaura una partida, incluida una exportada desde LeagueForge desktop v5.
+El Service Worker cambia a `leagueforge-vm-v1-3`, por lo que elimina la caché anterior al activarse.
 
-## Importante
-GitHub Pages aloja el juego, pero **no almacena tu savegame en el repositorio**. El save vive en tu iPhone. Por eso es recomendable exportar un JSON de backup de vez en cuando, especialmente para dinastías largas.
+## Qué cambia
 
-## Actualizar el juego
-Sustituye los archivos del repo por una nueva versión. El Service Worker actualizará la aplicación; el savegame está separado del código en IndexedDB.
+### Mercado más activo
+- Máximo normal: **5 entradas y 5 salidas por club**.
+- Recién ascendido: hasta **6 entradas**.
+- Los mínimos y máximos por posición siguen siendo obligatorios.
+- El mercado automático resuelve primero las propuestas que ya estaban pendientes y luego realiza nuevas oleadas.
+- Un fichaje puede reemplazar al peor jugador de esa misma posición si el club ya estaba en el máximo. El fichaje se queda y el desplazado pasa a agentes libres.
+- Stress de 5 universos × 30 temporadas: ~49,4 traspasos por verano de media, sin romper ninguna plantilla.
+
+### Economía sin inflación infinita
+- Techo de tesorería: **135M**.
+- Premios de Liga se han recalibrado.
+- Las plantillas pagan un mantenimiento más fuerte según su valor.
+- Las plantillas especialmente caras pagan un coste de lujo adicional.
+- A partir de 65M de caja aparece un coste progresivo de tesorería, de modo que acumular dinero sin gastarlo deja de ser gratis.
+- Al migrar desde VM 1.2, los presupuestos ya inflados se normalizan una sola vez de forma proporcional, no se resetean todos al mismo valor.
+
+Stress 5 × 30 temporadas:
+- mediana presupuestaria media al año 30: ~91M;
+- máximo medio al año 30: ~133M;
+- solo ~1,8% de las observaciones club-temporada tocaron el techo;
+- ningún presupuesto creció sin control.
+
+### Warning de club estancado
+En la ficha de club se detecta automáticamente:
+- **7 o más temporadas consecutivas en Segunda**, y
+- ninguna de ellas terminando en top 4.
+
+Aparece el aviso **⚠ Crisis institucional** con la racha exacta y la sugerencia de reestructuración. No hay boost automático ni rubber-banding: tú decides si renombrar, cambiar entrenador o reconstruir plantilla.
+
+### Plantillas y agentes libres
+- Tras retiradas se restauran inmediatamente los mínimos por posición antes del mercado.
+- Los agentes libres envejecen y el pool se poda para no crecer indefinidamente.
+- Máximos siguen siendo POR 3 / DEF 8 / MED 8 / DEL 6 / total 25.
+
+## Savegame
+- Schema VM 1.3: 5.3.
+- Sigue usando el mismo IndexedDB de VM 1.2.
+- Autosave + manual + 2 checkpoints.
+- gzip cuando Safari lo soporta.
+- Export/import JSON sigue siendo compatible.

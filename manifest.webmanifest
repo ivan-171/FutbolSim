@@ -1,7 +1,7 @@
 {
-  "name": "LeagueForge VM — Mobile Dynasty",
+  "name": "LeagueForge VM 1.3 — Mobile Dynasty",
   "short_name": "LeagueForge",
-  "description": "Simulador de ligas, copas, plantillas, mercado y dinastías de fútbol.",
+  "description": "Simulador móvil de ligas, copas, draft, mercado, economía y dinastías de fútbol.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

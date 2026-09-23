@@ -1,0 +1,43 @@
+LeagueForge VM 1.2 — Validation Report
+
+RESULTADO
+- Core LeagueForge: 60/60 PASS
+- Economía / mercado VM 1.1: 9/9 PASS
+- Draft VM 1.2: 8/8 PASS
+- TOTAL: 77/77 PASS
+- JavaScript syntax: PASS
+
+NUEVOS TESTS DE DRAFT
+1. Cuota de posiciones mantiene porteros escasos.
+2. El nº1 no está estructuralmente fijado a una posición.
+3. Cada draft almacena metadata de identidad de generación.
+4. Los picks siguen estrictamente ordenados por OVR.
+5. Un cuarto portero sustituye inmediatamente al peor portero anterior.
+6. El jugador drafteado queda protegido incluso si su OVR es el menor.
+7. Tras el draft ningún club supera los máximos de posición.
+8. El histórico del draft registra cualquier jugador liberado por el pick.
+
+STRESS TEST
+- 20 temporadas completas
+- Temporada alcanzada: 21
+- Drafts: 20
+- Posición de los 20 picks nº1:
+  - POR: 5
+  - DEF: 5
+  - MED: 8
+  - DEL: 2
+- Clases:
+  - Fuerte: 6
+  - Normal: 10
+  - Generacional: 3
+  - Floja: 1
+- Plantillas fuera de límites: 0
+- Agentes libres al final: 28
+- World JSON bruto aproximado: 538 KB
+- Errores de transición: 0
+
+COMPATIBILIDAD
+- VM 1.1 save schema 5.1 sigue siendo cargable.
+- VM 1.2 guarda como schema 5.2.
+- Mismo IndexedDB / misma URL de GitHub Pages.
+- Service Worker actualizado a cache leagueforge-vm-v1-2.

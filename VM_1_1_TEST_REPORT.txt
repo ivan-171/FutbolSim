@@ -1,0 +1,47 @@
+LeagueForge VM 1.1 — Validation Report
+
+FINAL TESTS
+- Core LeagueForge suite: 60/60 PASS
+- VM 1.1 balance/save suite: 9/9 PASS
+- Combined: 69/69 PASS
+- JavaScript syntax: PASS
+- Mobile layout check at 390 px: 390/390, no horizontal overflow
+- Desktop sidebar hidden on mobile: PASS
+- Bottom navigation present: PASS
+
+15-SEASON STRESS TEST
+- Reached season 16 after 15 completed seasons
+- Raw world JSON after 15 seasons: ~428 KB
+- Gzip equivalent: ~55 KB
+- Compression ratio: ~7.8x
+- No club outside roster limits
+- Goalkeeper range: 2–3
+- Defender range: 5–8
+- Midfielder range: 5–8
+- Forward range: 3–6
+- Budget range after stress: bounded by the new economy
+- Free-agent pool remained finite
+- Automatic market completed hundreds of valid transfers without breaking squad composition
+
+SAVE MIGRATION
+- Uses the same IndexedDB database/store as VM 1.0.
+- Old payload records remain readable.
+- On startup, VM 1.1 rewrites the newest saves into compact VM 1.1 format.
+- Only the two newest checkpoints are retained.
+- Historical `playerStats` blobs that were never consumed by the UI are removed.
+- Duplicated setup-team payloads are not stored during an active world.
+- Old large localStorage mirrors are removed when they exceed the safe fallback size.
+
+MARKET BALANCE
+- Buyer diversity enforced.
+- Seller diversity enforced.
+- Max incoming/outgoing rules enforced.
+- Relegated clubs cannot be dismantled beyond the summer limit.
+- Promoted clubs retain more of their squad and can make an extra incoming signing.
+- Position floors/caps enforced.
+- Free agents supported.
+- Club prestige influences coherent-market appeal, but budget and squad slots remain hard constraints.
+- Prize money and squad maintenance create a self-regulating budget loop.
+
+NOTE
+A true iOS Safari device test still has value because Safari/PWA lifecycle behavior can only be fully validated on-device. The browser-executed functional suites and 390 px mobile layout checks passed in the available environment.

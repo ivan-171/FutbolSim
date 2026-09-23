@@ -1,516 +1,4 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#08101d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="LeagueForge">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-<title>LeagueForge VM 1.3 — Mobile Dynasty</title>
-<style>
-:root{
- --bg:#08101d;--panel:#111c31;--panel2:#16243d;--line:#273a5d;--text:#f4f7ff;--muted:#91a5c5;
- --accent:#78a4ff;--accent2:#4fdec0;--good:#6ce6a6;--warn:#ffd36c;--bad:#ff7d8c;--cup:#dca7ff
-}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg),#060b14);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-button,input,select{font:inherit}button{cursor:pointer}
-.app{min-height:100vh;display:grid;grid-template-rows:66px 1fr}
-header{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;padding:0 18px;background:rgba(7,13,24,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
-.brand{font-size:19px;font-weight:950;letter-spacing:.1em}.brand small{font-size:9px;color:var(--muted);margin-left:7px}
-.headstats{margin-left:auto;display:flex;gap:7px}.hstat{border:1px solid var(--line);background:#0d1728;border-radius:10px;padding:7px 10px;font-size:11px;color:var(--muted)}.hstat b{color:var(--text);font-size:13px;margin-left:4px}
-main{display:grid;grid-template-columns:265px minmax(0,1fr)}
-nav{position:sticky;top:66px;height:calc(100vh - 66px);overflow:auto;padding:14px;background:#0d1626;border-right:1px solid var(--line)}
-.navtitle{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:10px 8px}
-.navbtn{width:100%;display:flex;align-items:center;gap:10px;padding:10px 11px;margin-bottom:4px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--text);text-align:left}
-.navbtn:hover{background:#15233b}.navbtn.active{background:#1b3152;border-color:#365b8b}.navbtn span:first-child{width:21px;text-align:center}
-.navnote{border:1px solid var(--line);border-radius:12px;background:#101a2d;padding:11px;margin-top:15px;font-size:11px;line-height:1.5;color:var(--muted)}
-.content{padding:20px;min-width:0}.view{display:none}.view.active{display:block}
-.hero{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:17px}.hero h1{margin:0 0 4px;font-size:27px}.hero p{margin:0;color:var(--muted)}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.btn{border:1px solid var(--line);border-radius:10px;background:#14223a;color:var(--text);padding:9px 12px;font-weight:750}.btn:hover{background:#1b2e4d}.btn.primary{background:linear-gradient(135deg,#416ee8,#725af1);border-color:#728df3}.btn.good{background:#123d34;border-color:#286f5d}.btn.cup{background:#302044;border-color:#674983}.btn.warn{background:#3d3214;border-color:#70602a}.btn.danger{background:#3b1820;border-color:#71323d}.btn:disabled{opacity:.42;cursor:not-allowed}
-.grid{display:grid;gap:14px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
-.card{background:linear-gradient(180deg,var(--panel),#0f192b);border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:0 8px 26px rgba(0,0,0,.11)}.card h3{font-size:14px;margin:0 0 11px}
-.kpi{font-size:27px;font-weight:950}.label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em}.muted{color:var(--muted)}.tiny{font-size:10px}.small{font-size:12px}
-.formrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}label{font-size:12px;color:#cbd8ed}input,select{width:100%;margin-top:5px;background:#0e182a;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 10px}input[type=checkbox]{width:auto;margin:0}
-.teamrow{display:grid;grid-template-columns:30px minmax(130px,1fr) 64px 64px 64px 40px;gap:7px;align-items:center;padding:7px;border-bottom:1px solid #223451}.teamrow input{margin:0}
-.playerrow{display:grid;grid-template-columns:minmax(130px,1.4fr) 55px 55px 55px 60px 70px 70px;gap:7px;align-items:center;padding:7px;border-bottom:1px solid #223451}.playerrow input,.playerrow select{margin:0;padding:7px 8px}
-.badge{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:10px;background:#101b2e}.dot{width:9px;height:9px;border-radius:50%}
-table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #243655;padding:8px 7px;font-size:12px;text-align:right;white-space:nowrap}th{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.05em}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}.tablewrap{overflow:auto}
-.match{display:grid;grid-template-columns:minmax(0,1fr) 120px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;background:#101a2d;padding:11px;margin-bottom:8px}.home{text-align:right}.away{text-align:left}.scorebox{text-align:center}.score{font-size:25px;font-weight:950}.dices{display:flex;gap:4px;justify-content:center;margin-top:5px}.die{display:grid;place-items:center;width:27px;height:27px;border:1px solid var(--line);border-radius:7px;background:#172640;font-weight:900}
-.round{border:1px solid var(--line);border-radius:12px;background:#101a2d;padding:11px;margin-bottom:10px}.roundtitle{font-weight:850;margin-bottom:8px}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.tab{border:1px solid var(--line);background:#101b2e;color:var(--text);border-radius:9px;padding:7px 10px}.tab.active{background:#203957}
-.empty{border:1px dashed var(--line);border-radius:12px;text-align:center;padding:22px;color:var(--muted)}
-.champ{background:linear-gradient(90deg,rgba(255,211,106,.14),transparent)}.promote{border-left:3px solid var(--good)}.relegate{border-left:3px solid var(--bad)}
-.trophyrow,.recordrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #233552}.trophyrow:last-child,.recordrow:last-child{border-bottom:0}
-.transfer{display:grid;grid-template-columns:minmax(140px,1.2fr) 1fr 95px auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:11px;background:#101a2d;margin-bottom:8px}
-.marketActions{display:flex;gap:6px;flex-wrap:wrap}.marketActions .btn{padding:7px 9px;font-size:11px}
-.news{padding:8px 0;border-bottom:1px solid #233552;font-size:12px}.news:last-child{border-bottom:0}
-.bar{height:7px;background:#0a1221;border-radius:999px;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.hof{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;padding:9px 0;border-bottom:1px solid #233552}.rank{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#182945;border:1px solid var(--line);font-weight:900}
-.toast{position:fixed;right:16px;bottom:16px;display:none;background:#101c30;border:1px solid var(--line);border-radius:10px;padding:11px 14px;box-shadow:0 18px 45px rgba(0,0,0,.4);font-size:12px;z-index:60}
-.testbanner{display:none;margin-bottom:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#101b2e;font-size:12px}
-@media(max-width:1100px){main{grid-template-columns:1fr}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);display:flex;gap:5px;overflow:auto;padding:9px}.navtitle,.navnote{display:none}.navbtn{width:auto;min-width:max-content;margin:0}.g4{grid-template-columns:1fr 1fr}}
-@media(max-width:760px){header{padding:11px;height:auto;min-height:66px}.headstats{display:none}.brand small{display:none}.content{padding:12px}.hero{flex-direction:column}.g2,.g3,.g4,.formrow{grid-template-columns:1fr}.teamrow{grid-template-columns:28px minmax(120px,1fr) 58px 58px}.playerrow{grid-template-columns:1fr 55px 55px}.playerrow>*:nth-child(n+4){grid-column:auto}.match{grid-template-columns:1fr 82px 1fr}.transfer{grid-template-columns:1fr}.actions{width:100%}}
 
-/* ===== LeagueForge v4 UX layer ===== */
-:root{
- --surface:#0d1728;--surface2:#121f35;--surface3:#182943;
- --pitch:#53d39b;--gold:#f5c967;--purple:#c79aff;
- --radius:16px;--radius-sm:11px;--focus:0 0 0 3px rgba(120,164,255,.24)
-}
-html{scroll-behavior:smooth}
-body{background:
- radial-gradient(circle at 78% -15%,rgba(82,123,222,.17),transparent 31rem),
- radial-gradient(circle at 15% 12%,rgba(79,222,192,.07),transparent 24rem),
- linear-gradient(180deg,#09111f,#060b14 65%)}
-header{height:68px;border-bottom-color:#223654;box-shadow:0 8px 24px rgba(0,0,0,.16)}
-.brand{display:flex;align-items:center;gap:9px;letter-spacing:.08em}
-.brand:before{content:"LF";display:grid;place-items:center;width:33px;height:33px;border-radius:10px;background:linear-gradient(145deg,#517cec,#58dabd);color:#07111c;font-size:11px;font-weight:1000;letter-spacing:0;box-shadow:0 6px 18px rgba(83,132,232,.25)}
-.hstat{background:rgba(17,28,48,.82);padding:8px 11px}
-nav{top:68px;height:calc(100vh - 68px);padding:16px 12px;background:linear-gradient(180deg,#0c1627,#091221)}
-.navbtn{position:relative;min-height:42px;padding:10px 12px;color:#cbd7ec}
-.navbtn:hover{color:#fff;background:#14243c}
-.navbtn.active{color:#fff;background:linear-gradient(90deg,#1c3559,#182b49);border-color:#3a5f90}
-.navbtn.active:after{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;background:var(--accent2);border-radius:0 4px 4px 0}
-.content{max-width:1560px;width:100%;margin:0 auto;padding:18px 24px 32px}
-.hero{align-items:center;padding:3px 2px;margin-bottom:14px}
-.hero h1{font-size:clamp(24px,2.2vw,32px);letter-spacing:-.035em}
-.hero p{font-size:13px;max-width:720px}
-.card{border-color:#233958;border-radius:var(--radius);background:
- linear-gradient(180deg,rgba(20,33,56,.98),rgba(13,23,40,.98));
- box-shadow:0 10px 28px rgba(0,0,0,.14)}
-.card h3{font-size:13px;letter-spacing:.01em;color:#eaf1ff}
-.btn{min-height:40px;border-radius:11px;transition:transform .12s ease,background .12s ease,border-color .12s ease}
-.btn:hover:not(:disabled){transform:translateY(-1px)}
-.btn:active:not(:disabled){transform:translateY(0)}
-.btn.primary{background:linear-gradient(135deg,#527dec,#745cf2);box-shadow:0 7px 18px rgba(89,101,234,.16)}
-.btn.good{background:linear-gradient(135deg,#143f38,#185144)}
-.btn.cup{background:linear-gradient(135deg,#342047,#45275c)}
-input,select{min-height:40px;border-color:#29405f;background:#0b1627;transition:border-color .12s ease,box-shadow .12s ease}
-input:focus,select:focus,button:focus-visible{outline:none;border-color:#6f9df7;box-shadow:var(--focus)}
-table{font-variant-numeric:tabular-nums}
-.tablewrap{padding:0;overflow:auto}
-.tablewrap h3{position:sticky;left:0;padding:15px 15px 6px;margin:0;background:linear-gradient(90deg,#121e33 85%,transparent);z-index:2}
-.tablewrap table{min-width:620px}
-thead{position:sticky;top:0;z-index:1;background:#101b2f}
-th{padding-top:10px;padding-bottom:10px}
-tbody tr{transition:background .12s ease}
-tbody tr:hover{background:rgba(119,164,255,.055)}
-.kpi{font-variant-numeric:tabular-nums;letter-spacing:-.04em}
-.label{font-weight:800}
-.empty{background:rgba(8,15,27,.28);min-height:74px;display:grid;place-items:center}
-.badge{font-weight:750;background:#0d192b}
-.dot{box-shadow:0 0 0 2px rgba(255,255,255,.06)}
-.news{line-height:1.42}
-.toast{border-color:#3c5479;background:#111f35;padding:12px 15px;font-weight:700;animation:toastIn .18s ease}
-@keyframes toastIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-
-/* Persistent season command bar */
-.commandbar{position:sticky;top:80px;z-index:18;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;margin:0 0 18px;padding:11px 13px;border:1px solid #2a4163;border-radius:14px;background:rgba(12,23,40,.93);backdrop-filter:blur(14px);box-shadow:0 9px 28px rgba(0,0,0,.18)}
-.phaseRail{display:flex;align-items:center;gap:5px;min-width:0}
-.phaseStep{display:flex;align-items:center;gap:6px;color:#7187a8;font-size:11px;font-weight:800;white-space:nowrap}
-.phaseStep:before{content:"";width:8px;height:8px;border-radius:50%;background:#334660;box-shadow:0 0 0 3px rgba(51,70,96,.2)}
-.phaseStep.done{color:#9fcabf}.phaseStep.done:before{background:var(--accent2)}
-.phaseStep.active{color:#fff}.phaseStep.active:before{background:var(--accent);box-shadow:0 0 0 4px rgba(120,164,255,.14)}
-.phaseLine{height:1px;width:28px;background:#2a3b55;flex:0 1 28px}
-.nextAction{display:flex;align-items:center;gap:10px}
-.nextActionCopy{text-align:right;max-width:300px}
-.nextActionCopy b{display:block;font-size:12px}.nextActionCopy span{font-size:10px;color:var(--muted)}
-.nextAction .btn{white-space:nowrap}
-
-/* Dashboard / simulator game-feel */
-.dashboardFocus{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.6fr);gap:14px;margin-bottom:14px}
-.focusPanel{position:relative;overflow:hidden;padding:18px;background:
- radial-gradient(circle at 95% 0,rgba(79,222,192,.13),transparent 260px),
- linear-gradient(145deg,#152642,#101b30);border:1px solid #2d466b;border-radius:18px}
-.focusPanel:after{content:"";position:absolute;right:-70px;bottom:-100px;width:260px;height:260px;border:1px solid rgba(255,255,255,.04);border-radius:50%}
-.focusEyebrow{font-size:10px;color:var(--accent2);font-weight:900;text-transform:uppercase;letter-spacing:.12em}
-.focusTitle{font-size:23px;font-weight:950;letter-spacing:-.025em;margin:5px 0 2px}
-.focusSub{font-size:12px;color:var(--muted)}
-.focusActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.miniStand{display:grid;gap:7px;margin-top:9px}.miniStandRow{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;font-size:12px;padding:7px 8px;border-radius:9px;background:rgba(6,13,24,.28)}
-.progress{height:7px;border-radius:999px;background:#0a1424;overflow:hidden}.progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:inherit}
-.progressMeta{display:flex;justify-content:space-between;gap:10px;margin:7px 0 5px;font-size:10px;color:var(--muted)}
-
-/* Match presentation */
-.match{position:relative;min-height:72px;background:linear-gradient(180deg,#111e33,#0d1728);border-color:#263d5f}
-.match:before{content:"";position:absolute;left:50%;top:9px;bottom:9px;width:1px;background:rgba(255,255,255,.035)}
-.match .home,.match .away{min-width:0}
-.match b{font-size:13px}
-.score{letter-spacing:-.04em}
-.resultWin{border-color:rgba(108,230,166,.28)}.resultDraw{border-color:rgba(255,211,108,.25)}
-.lastResults{margin-top:14px;padding-top:13px;border-top:1px solid #243955}
-.lastResultsTitle{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.resultCompact{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #21334f;font-size:11px}
-.resultCompact:last-child{border-bottom:0}
-.resultCompact .rscore{font-size:15px;font-weight:950}
-.diceMini{color:#99afd0;font-variant-numeric:tabular-nums}
-
-/* Editors */
-.editorToolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;padding:10px 11px;border:1px solid #263b5d;border-radius:12px;background:#0e192b}
-.editorToolbar .filters{display:flex;gap:7px;flex-wrap:wrap;min-width:0}
-.editorToolbar input,.editorToolbar select{margin:0;min-height:36px;padding:7px 9px}
-.editorToolbar input{min-width:190px}
-.teamrow,.playerrow{border-radius:8px;margin:1px 3px;border-bottom-color:#213451}
-.teamrow:not(.label):hover,.playerrow:not(.label):hover{background:#14223a}
-.playerrow{grid-template-columns:minmax(150px,1.45fr) 58px 58px 58px 84px 62px 62px 76px}
-.ovrBadge{display:inline-grid;place-items:center;min-width:34px;height:29px;padding:0 7px;border-radius:8px;background:#182a46;border:1px solid #2d4569;font-weight:950}
-.valueText{font-size:11px;color:#d6e2f6;text-align:right}
-
-/* Setup: mode choice reads like game modes */
-.modeGuide{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 12px}
-.modeCard{padding:10px;border:1px solid #29405f;border-radius:12px;background:#0e192c}
-.modeCard b{display:block;font-size:11px;margin-bottom:3px}.modeCard span{font-size:10px;color:var(--muted);line-height:1.35}
-.modeCard.active{border-color:#638fe4;background:#162a48;box-shadow:inset 0 0 0 1px rgba(120,164,255,.12)}
-.systemTools{margin-top:14px;padding-top:13px;border-top:1px solid #263957}
-
-/* Tables & zones */
-.tableLegend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:0 2px 10px;font-size:10px;color:var(--muted)}
-.legendMark{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}.legendMark.up{background:var(--good)}.legendMark.down{background:var(--bad)}.legendMark.title{background:var(--gold)}
-
-/* Market */
-.marketSummary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
-.marketMetric{padding:10px 11px;border-radius:12px;background:#101c30;border:1px solid #273d5e}.marketMetric b{font-size:18px;display:block}.marketMetric span{font-size:10px;color:var(--muted)}
-.transfer{grid-template-columns:minmax(180px,1.2fr) minmax(180px,1fr) 110px auto;padding:12px}
-.transferPlayer{display:flex;align-items:center;gap:9px}.playerIcon{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#1a2b48;border:1px solid #304a70;font-size:10px;font-weight:950}
-.feeGood{color:var(--good)}.feeHigh{color:var(--warn)}.budgetBad{color:var(--bad)}
-.valuation{margin-top:8px;padding:9px;border-radius:10px;background:#0c1728;border:1px solid #233956;font-size:11px}
-
-/* Archive / records */
-.seasonHero{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px;border-radius:11px;background:#0d192b;margin-bottom:8px}
-.seasonNumber{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#1a2c49;font-weight:950;color:var(--gold)}
-.hof .rank{background:linear-gradient(145deg,#192d4b,#16243b)}
-
-/* Mobile */
-@media(max-width:1100px){
- .commandbar{top:128px}.dashboardFocus{grid-template-columns:1fr}.playerrow{grid-template-columns:minmax(140px,1fr) 58px 58px 58px}.playerrow>*:nth-child(n+5){grid-column:auto}
-}
-@media(max-width:760px){
- .content{padding:11px}.commandbar{position:static;grid-template-columns:1fr}.phaseRail{overflow:auto;padding-bottom:2px}.nextAction{justify-content:space-between}.nextActionCopy{text-align:left}
- .marketSummary{grid-template-columns:1fr 1fr}.editorToolbar{align-items:stretch;flex-direction:column}.editorToolbar .filters{display:grid;grid-template-columns:1fr 1fr}.editorToolbar input{min-width:0;grid-column:1/-1}
- .playerrow{grid-template-columns:minmax(125px,1fr) 54px 54px}.playerrow>*:nth-child(n+4){grid-column:auto}.modeGuide{grid-template-columns:1fr}
-}
-
-
-/* ===== v4.1 hardening + matchday reveal ===== */
-.matchdayTools{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:10px 12px;border:1px solid #29415f;border-radius:13px;background:#0d192b}
-.matchdayTools .left,.matchdayTools .right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.matchdayTools select{width:auto;min-width:190px;margin:0}.matchdayTools .btn{min-height:38px;padding:8px 10px}
-.resultReveal{position:relative;overflow:hidden;margin-bottom:14px;padding:18px;border:1px solid #385b87;border-radius:18px;background:radial-gradient(circle at 50% -40%,rgba(120,164,255,.20),transparent 300px),linear-gradient(145deg,#162944,#0d182a);box-shadow:0 14px 34px rgba(0,0,0,.18)}
-.resultReveal:before{content:"RESULTADO";position:absolute;right:14px;top:10px;font-size:9px;letter-spacing:.18em;font-weight:950;color:#6f86a8}
-.revealMeta{text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:850}.revealScore{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center;margin:11px auto 8px;max-width:760px}.revealClub{font-size:clamp(18px,2.4vw,28px);font-weight:950;letter-spacing:-.03em}.revealClub.home{text-align:right}.revealClub.away{text-align:left}.revealNumber{font-size:clamp(34px,5vw,54px);font-weight:1000;letter-spacing:-.07em;white-space:nowrap}.revealDetail{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:760px;margin:0 auto}.revealDetail>div{padding:9px 10px;border-radius:11px;background:rgba(7,14,25,.32);font-size:11px;color:#b7c7df}.revealDetail .right{text-align:right}.scorerLine{margin-top:4px;color:#eef4ff}.fixtureState{display:flex;align-items:center;justify-content:center;gap:5px}.fixtureBtn{min-width:74px;padding:7px 9px!important;min-height:34px!important;font-size:11px}.playedBadge{color:var(--good);font-size:10px;font-weight:850}.fixtureResult{font-size:20px;font-weight:950;letter-spacing:-.04em}
-.clubContext{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.scopeBadge{padding:5px 8px;border-radius:999px;border:1px solid #315078;background:#12243d;font-size:10px;font-weight:850;color:#c9d9ef}.scopeBadge.live{border-color:#3c7b67;color:#99e5c8;background:#112c27}
-.autosaveDot{color:var(--good)}
-.saveTools{display:flex;gap:8px;flex-wrap:wrap}.saveTools input[type=file]{display:none}
-.marketGuard{margin-top:5px;color:var(--bad);font-size:10px}.marketSafe{margin-top:5px;color:var(--good);font-size:10px}
-@media(max-width:760px){.revealScore{grid-template-columns:1fr auto 1fr;gap:8px}.revealDetail{grid-template-columns:1fr}.matchdayTools{align-items:stretch}.matchdayTools .left,.matchdayTools .right{width:100%}.matchdayTools select{min-width:0;flex:1}.resultReveal{padding:15px 10px}.revealClub{font-size:17px}.revealNumber{font-size:36px}}
-
-
-/* ===== v5 dynasty / club browser / smart market ===== */
-.clubBrowser{display:none}.clubBrowser.active{display:block}.clubPicker{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-bottom:14px}
-.clubTile{display:flex;align-items:center;gap:8px;padding:9px;border:1px solid #28405f;border-radius:12px;background:#0e192b;color:var(--text);text-align:left;min-width:0}
-.clubTile:hover{background:#152640}.clubTile.active{border-color:#6a96eb;background:#182e4e;box-shadow:inset 0 0 0 1px rgba(120,164,255,.15)}
-.clubCrest{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(255,255,255,.12);font-size:13px;font-weight:950;flex:0 0 auto}
-.clubCrest.big{width:92px;height:92px;border-radius:20px;font-size:24px}.clubCrest img{width:100%;height:100%;object-fit:contain;background:#07101d}
-.clubProfileHead{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}.clubIdentity h2{margin:0 0 4px;font-size:25px}.clubIdentity p{margin:0;color:var(--muted);font-size:12px}
-.clubFacts{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.clubFact{padding:5px 8px;border:1px solid #29425f;border-radius:999px;background:#0d192b;font-size:10px}
-.clubStatsGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0}.clubStat{padding:10px;border:1px solid #263c5b;border-radius:12px;background:#0d192b}.clubStat b{display:block;font-size:18px}.clubStat span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.clubProfileGrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:14px}.clubHistoryTable{max-height:440px;overflow:auto}
-.coachCard{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center}.coachAvatar{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#2d4264,#17263f);font-size:20px}
-.uploadCrest{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.uploadCrest input{display:none}
-.palmaresGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-bottom:14px}.palmaresRow{display:grid;grid-template-columns:1fr repeat(5,70px);gap:7px;align-items:center;padding:8px 0;border-bottom:1px solid #223652;font-size:11px}.palmaresRow.header{color:var(--muted);font-size:9px;text-transform:uppercase;font-weight:800}
-.historySeason{border:1px solid #29415f;border-radius:15px;background:#0f1a2d;margin-bottom:10px;overflow:hidden}.historySeasonTop{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;padding:13px}.historySeasonBody{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:0 13px 13px}.histBlock{padding:9px;border-radius:10px;background:#0b1627;border:1px solid #223856}.histBlock span{font-size:9px;color:var(--muted);text-transform:uppercase;display:block}.histBlock b{font-size:12px}
-.historyTables{border-top:1px solid #263c5a;padding:12px 13px}.historyTables summary{cursor:pointer;font-size:11px;font-weight:800;color:#bfd0e9}.historicalTable{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.marketRules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.marketRule{padding:10px;border:1px solid #29415f;border-radius:12px;background:#0e192b}.marketRule.active{border-color:#6b95e7;background:#162c4a}.marketRule b{font-size:11px;display:block}.marketRule span{font-size:10px;color:var(--muted);line-height:1.35}
-.marketMemory{padding:8px 10px;border:1px dashed #2b4568;border-radius:10px;font-size:10px;color:var(--muted);margin-bottom:10px}
-.draftPanel{margin-bottom:14px;border:1px solid #614f29;background:linear-gradient(145deg,#241f14,#151a27);border-radius:15px;padding:13px}.draftHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px}.draftGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:7px}.draftPick{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:8px;border-radius:10px;background:#0d1727;border:1px solid #3b392b}.pickNo{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#3a3017;color:#ffd877;font-weight:950}.draftPick b{font-size:11px}.draftPick span{font-size:9px;color:var(--muted)}
-.recordClub{display:block;color:#91a8c7;font-size:9px;font-weight:500;margin-top:2px}
-.coachImpact{color:var(--accent2);font-size:10px;margin-top:4px}
-.autoMarketLog{padding:9px;border:1px solid #29415f;border-radius:10px;background:#0d192b;margin-top:9px;font-size:10px;color:var(--muted)}
-@media(max-width:1000px){.clubProfileGrid,.palmaresGrid{grid-template-columns:1fr}.clubStatsGrid{grid-template-columns:repeat(3,1fr)}.historySeasonBody{grid-template-columns:1fr 1fr}.historicalTable{grid-template-columns:1fr}}
-@media(max-width:700px){.clubProfileHead{grid-template-columns:auto 1fr}.clubProfileHead>.actions{grid-column:1/-1}.clubStatsGrid{grid-template-columns:1fr 1fr}.marketRules{grid-template-columns:1fr}.historySeasonTop{grid-template-columns:48px 1fr}.historySeasonTop>:last-child{grid-column:1/-1}.historySeasonBody{grid-template-columns:1fr}.palmaresRow{grid-template-columns:1fr repeat(2,56px)}.palmaresRow>*:nth-child(n+4){display:none}}
-
-
-/* ===== LEAGUEFORGE VM — iPhone-first shell ===== */
-:root{--tab-h:68px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px)}
-html{-webkit-text-size-adjust:100%;background:#07101c}
-body{overscroll-behavior-y:none;padding-bottom:calc(var(--tab-h) + var(--safe-b));overflow-x:hidden;-webkit-tap-highlight-color:transparent}
-.app{display:block;min-height:100%;padding:0}
-header{height:auto;min-height:54px;padding:calc(7px + var(--safe-t)) 14px 8px;position:sticky;top:0;z-index:40;background:rgba(7,13,24,.96);border-bottom:1px solid #223654;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.brand{font-size:14px;letter-spacing:.05em;gap:7px}.brand:before{width:30px;height:30px;border-radius:9px}.brand small{display:inline;font-size:8px}
-.headstats{display:none}
-main{display:block}.content{max-width:none;padding:12px 12px 24px;margin:0;width:100%}
-main>nav{display:none!important}
-.hero{display:block;margin:4px 0 12px;padding:0}.hero h1{font-size:24px;line-height:1.08}.hero p{font-size:12px;line-height:1.45;margin-top:5px}.hero>.actions,.hero>.saveTools{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%}
-.btn{min-height:46px;padding:10px 12px;border-radius:13px;font-size:13px;touch-action:manipulation}.actions .btn,.saveTools .btn{width:100%}
-input,select{font-size:16px!important;min-height:46px;border-radius:12px}label{font-size:11px}
-.card{border-radius:16px;padding:13px;box-shadow:none}.grid,.g2,.g3,.g4,.clubProfileGrid,.palmaresGrid{grid-template-columns:1fr!important;gap:10px}
-.commandbar{position:static;display:block;padding:10px;margin:0 0 12px;border-radius:14px}.phaseRail{gap:3px;overflow:hidden}.phaseStep{font-size:9px;flex:0 0 auto}.phaseLine{width:auto;min-width:8px;flex:1}.nextAction{margin-top:10px;display:grid;grid-template-columns:1fr auto;gap:8px}.nextActionCopy{text-align:left;max-width:none}.nextAction .btn{min-width:118px}.progressMeta{font-size:9px}
-.dashboardFocus{display:block}.focusPanel{padding:15px;border-radius:17px;margin-bottom:10px}.focusTitle{font-size:21px}.focusActions{display:grid;grid-template-columns:1fr 1fr}.miniStand{gap:5px}.miniStandRow{padding:8px}.kpi{font-size:24px}
-.view{animation:vmIn .14s ease}.view.active{display:block}@keyframes vmIn{from{opacity:.6;transform:translateY(4px)}to{opacity:1;transform:none}}
-
-/* Bottom navigation */
-.vm-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:80;height:calc(var(--tab-h) + var(--safe-b));padding:6px 7px calc(6px + var(--safe-b));display:grid;grid-template-columns:repeat(5,1fr);gap:3px;background:rgba(8,16,29,.96);border-top:1px solid #263a59;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-.vm-tab{border:0;background:transparent;color:#7f93b3;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;font-size:9px;font-weight:750;touch-action:manipulation}.vm-tab .ico{font-size:20px;line-height:1}.vm-tab.active{color:#fff;background:#172943}.vm-tab.active .ico{transform:translateY(-1px)}
-.vm-more-backdrop{display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.48);padding:0 10px calc(var(--tab-h) + var(--safe-b) + 7px);align-items:flex-end}.vm-more-backdrop.open{display:flex}
-.vm-more-sheet{width:100%;max-height:72vh;overflow:auto;background:#101c30;border:1px solid #2d4668;border-radius:20px;padding:12px;box-shadow:0 -16px 50px rgba(0,0,0,.38)}
-.vm-sheet-handle{width:44px;height:4px;background:#425774;border-radius:999px;margin:0 auto 11px}.vm-more-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}.vm-more-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.vm-more-item{min-height:58px;border:1px solid #263d5d;border-radius:13px;background:#121f34;color:#e9f0fc;text-align:left;padding:9px 10px;font-weight:750}.vm-more-item span{display:block;font-size:10px;color:#8fa4c4;font-weight:500;margin-top:2px}.vm-storage{margin-top:10px;padding:10px;border-radius:12px;background:#0c1727;border:1px solid #213653;font-size:10px;color:#93a8c6;line-height:1.45}
-
-/* League matchday: big reveal, then one-card-at-a-time */
-#league .hero>.actions{grid-template-columns:1fr 1fr}#league .tabs,#calendar .tabs{position:sticky;top:calc(55px + var(--safe-t));z-index:25;background:#08111f;padding:5px 0 7px;margin:0 0 8px}.tab{min-height:42px;flex:1;font-size:12px}.tabs{display:flex;flex-wrap:nowrap}.matchdaySpotlight{padding:17px 13px;border-radius:18px}.spotScore{font-size:48px;line-height:1}.spotTeams{font-size:13px}.match{grid-template-columns:1fr 82px 1fr;min-height:84px;padding:10px 7px}.match b{font-size:12px}.score{font-size:23px}.match .btn{min-height:38px;font-size:11px;padding:7px 9px}.lastResults{margin-top:11px}.resultCompact{grid-template-columns:1fr auto 1fr;gap:5px}.resultCompact .diceMini{grid-column:1/-1;text-align:center;font-size:9px}.resultCompact .rscore{font-size:14px}
-
-/* Standings: hide wide desktop tables; show mobile cards injected by JS */
-#tables .tableLegend{font-size:9px;gap:7px}#tables .tablewrap table{display:none}.vm-standings{display:grid;gap:5px;padding:0 10px 12px}.vm-standing-row{display:grid;grid-template-columns:28px minmax(0,1fr) 34px 40px 44px;gap:6px;align-items:center;padding:9px 7px;border-bottom:1px solid #213451;font-size:11px}.vm-standing-row .pos{font-weight:950}.vm-standing-row .club{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vm-standing-row .pts{font-size:14px;font-weight:950;text-align:right}.vm-standing-row .mini{font-size:9px;color:#8fa5c3;text-align:right}.vm-standing-row.champion{background:rgba(245,201,103,.07);border-radius:9px}.vm-standing-row.up{border-left:3px solid var(--good)}.vm-standing-row.down{border-left:3px solid var(--bad)}
-
-/* Players: card-like rows, no dense spreadsheet */
-#players .editorToolbar{display:block}.editorToolbar .filters{display:grid;grid-template-columns:1fr 1fr;gap:6px}.editorToolbar .filters input{grid-column:1/-1;min-width:0}.playerrow.label{display:none}.playerrow:not(.label){display:grid;grid-template-columns:minmax(0,1fr) 62px 62px;gap:7px;padding:11px 8px;margin-bottom:6px;border:1px solid #253b5b;border-radius:13px;background:#0e192c}.playerrow .pn{grid-column:1/-1;font-weight:800}.playerrow>*{min-width:0}.playerrow span{font-size:11px}.valueText{text-align:left}.playerrow:before{display:none}
-
-/* Clubs */
-.clubPicker{display:flex;overflow:auto;scroll-snap-type:x mandatory;padding-bottom:4px;gap:7px}.clubTile{min-width:145px;scroll-snap-align:start}.clubProfileHead{display:grid;grid-template-columns:76px 1fr;gap:11px}.clubCrest.big{width:76px;height:76px}.clubProfileHead>.actions{grid-column:1/-1}.clubIdentity h2{font-size:21px}.clubStatsGrid{grid-template-columns:repeat(3,1fr)!important;gap:6px}.clubStat{padding:9px 7px}.clubStat b{font-size:16px}.clubHistoryTable table{min-width:560px}.coachCard{grid-template-columns:44px 1fr}.coachAvatar{width:44px;height:44px}
-
-/* Market */
-.marketRules{display:grid;grid-template-columns:1fr;gap:6px}.marketRule{min-height:62px;text-align:left}.marketSummary{grid-template-columns:1fr 1fr;gap:6px}.marketMetric{padding:9px}.marketMetric b{font-size:16px}.transfer{display:block;padding:12px}.transfer>div{margin-bottom:9px}.marketActions{display:grid;grid-template-columns:1fr 1fr}.marketActions .btn{min-height:44px}.draftGrid{display:flex;overflow:auto;scroll-snap-type:x mandatory}.draftPick{min-width:200px;scroll-snap-align:start}.draftPanel{padding:11px}.marketMemory{line-height:1.4}
-
-/* History / records */
-.palmaresRow{grid-template-columns:minmax(0,1fr) 44px 44px!important;gap:5px}.palmaresRow>*:nth-child(n+4){display:none}.historySeasonTop{grid-template-columns:45px 1fr}.historySeasonTop>:last-child{grid-column:1/-1;text-align:left!important}.historySeasonBody{grid-template-columns:1fr 1fr!important;gap:6px}.histBlock{padding:8px}.historicalTable{grid-template-columns:1fr}.historicalTable .tablewrap{overflow:auto}.historicalTable table{min-width:580px}.recordrow{align-items:flex-start}.recordrow b{text-align:right;max-width:60%}.hof{grid-template-columns:36px 1fr}.hof>:last-child{grid-column:2;text-align:left!important}
-
-/* Setup */
-.modeGuide{grid-template-columns:1fr}.formrow{grid-template-columns:1fr}.systemTools .btn{width:100%}.saveTools{display:grid!important;grid-template-columns:1fr 1fr!important}.saveTools input{display:none}
-
-/* Install card */
-.vm-install-card{display:none;margin:0 0 12px;padding:12px;border:1px solid #3b516f;border-radius:15px;background:linear-gradient(145deg,#14243b,#0d192b)}.vm-install-card.show{display:block}.vm-install-card b{display:block;font-size:13px}.vm-install-card p{font-size:10px;line-height:1.45;color:#97aac7;margin:5px 0 9px}.vm-install-card .btn{width:100%}
-
-/* iOS details */
-@supports(padding:max(0px)){.vm-tabbar{padding-bottom:max(6px,var(--safe-b))}}
-@media(orientation:landscape) and (max-height:500px){.vm-tabbar{--tab-h:58px}.vm-tab .ico{font-size:17px}.vm-more-sheet{max-height:84vh}.commandbar{display:none}}
-@media(min-width:700px){body{max-width:620px;margin:0 auto;border-left:1px solid #1e304b;border-right:1px solid #1e304b}.vm-tabbar{left:50%;right:auto;transform:translateX(-50%);width:620px}.vm-more-backdrop{left:50%;right:auto;transform:translateX(-50%);width:620px}.content{padding-left:16px;padding-right:16px}}
-
-
-/* ===== VM 1.1 balance/save hardening ===== */
-.marketRules{grid-template-columns:repeat(2,1fr)!important}
-.vm-finance-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:7px 0;border-bottom:1px solid #223652;font-size:11px}
-.vm-finance-row:last-child{border-bottom:0}
-.vm-pos-strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.vm-pos-pill{padding:5px 7px;border-radius:999px;border:1px solid #29415f;background:#0c1727;font-size:10px}
-.vm-pos-pill.warn{border-color:#7b5b30;color:#ffd58a}
-.vm-pos-pill.bad{border-color:#753942;color:#ff9ba6}
-.vm-budget-note{font-size:10px;color:var(--muted);margin-top:5px}
-@media(max-width:700px){.marketRules{grid-template-columns:1fr!important}}
-
-
-/* ===== VM 1.3 draft identity ===== */
-.draftMeta{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0 10px}.draftMeta .badge{font-size:9px}.draftClassStrong{border-color:#4f8c76;color:#89e2bd}.draftClassWeak{border-color:#705b33;color:#e8c67c}.draftRelease{display:block;margin-top:3px;color:#e3b676;font-size:8px;line-height:1.25}.draftTop{border-color:#75612f;background:linear-gradient(145deg,#1b1a12,#101824)}
-
-.stagnationWarning{margin-top:10px;padding:10px 11px;border-radius:11px;border:1px solid #7a532d;background:#2b2014;color:#ffe0a6;font-size:11px;line-height:1.4}.stagnationWarning b{color:#ffd17e}.stagnationBadge{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:#3b2a16;border:1px solid #725027;color:#ffd58a;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
-</style>
-</head>
-<body>
-<div class="app">
-<header>
- <div class="brand"><span>LEAGUEFORGE</span> <small>VM · MOBILE</small></div>
- <div class="headstats"><div class="hstat">Temporada <b id="hSeason">1</b></div><div class="hstat">Fase <b id="hPhase">Preparación</b></div><div class="hstat">Modo <b id="hMode">Valoraciones</b></div><div class="hstat">Autosave <b id="autosaveState">—</b></div></div>
-</header>
-<main>
-<nav>
- <div class="navtitle">Mundo</div>
- <button class="navbtn active" data-view="dashboard"><span>🏟️</span><span>Resumen</span></button>
- <button class="navbtn" data-view="teams"><span>🛠️</span><span>Clubes</span></button>
- <button class="navbtn" data-view="players"><span>👥</span><span>Jugadores</span></button>
- <button class="navbtn" data-view="setup"><span>⚙️</span><span>Configurar</span></button>
- <div class="navtitle">Temporada</div>
- <button class="navbtn" data-view="league"><span>🎲</span><span>Liga</span></button>
- <button class="navbtn" data-view="cup"><span>🏆</span><span>Copa</span></button>
- <button class="navbtn" data-view="tables"><span>📊</span><span>Clasificaciones</span></button>
- <button class="navbtn" data-view="stats"><span>⚽</span><span>Rendimiento</span></button>
- <div class="navtitle">Entre temporadas</div>
- <button class="navbtn" data-view="market"><span>💸</span><span>Mercado</span></button>
- <div class="navtitle">Historia</div>
- <button class="navbtn" data-view="history"><span>📚</span><span>Temporadas</span></button>
- <button class="navbtn" data-view="records"><span>👑</span><span>Récords</span></button>
- <button class="navbtn" data-view="hof"><span>🌟</span><span>Hall of Fame</span></button>
- <div class="navnote"><b style="color:var(--text)">Flujo de juego</b><br>Juega Liga y Copa → cierra la temporada → gestiona el mercado → comienza un nuevo año. El estado superior siempre te indica el siguiente paso.</div>
-</nav>
-
-<section class="content">
-<div id="testBanner" class="testbanner"></div>
-
-<div class="commandbar" id="commandBar">
- <div>
-  <div class="phaseRail" aria-label="Progreso de temporada">
-   <span class="phaseStep" id="phaseLeague">Liga</span><span class="phaseLine"></span>
-   <span class="phaseStep" id="phaseCup">Copa</span><span class="phaseLine"></span>
-   <span class="phaseStep" id="phaseMarket">Mercado</span><span class="phaseLine"></span>
-   <span class="phaseStep" id="phaseArchive">Historial</span>
-  </div>
-  <div class="progressMeta"><span id="seasonProgressText">Crea un universo para comenzar</span><span id="seasonProgressPct">0%</span></div>
-  <div class="progress"><span id="seasonProgressBar" style="width:0%"></span></div>
- </div>
- <div class="nextAction">
-  <div class="nextActionCopy"><b id="nextActionTitle">Preparar competición</b><span id="nextActionHint">Configura clubes y reglas.</span></div>
-  <button class="btn primary" id="nextActionBtn" type="button">Configurar</button>
- </div>
-</div>
-
-
-<div id="dashboard" class="view active">
- <div class="hero"><div><h1>Centro de mando</h1><p>Todo lo importante de tu universo, con el siguiente paso siempre visible.</p></div><div class="actions"><button class="btn primary" id="quickStart">⚡ Crear mundo rápido</button></div></div>
- <div class="dashboardFocus">
-  <div class="focusPanel">
-   <div class="focusEyebrow" id="focusEyebrow">NUEVO UNIVERSO</div>
-   <div class="focusTitle" id="focusTitle">Construye tu historia</div>
-   <div class="focusSub" id="focusSub">Configura los clubes y empieza la primera temporada.</div>
-   <div class="focusActions"><button class="btn primary" id="focusPrimary" type="button">Configurar competición</button><button class="btn" id="focusSecondary" type="button">Editar clubes</button></div>
-   <div id="focusProgress"></div>
-  </div>
-  <div class="card"><div class="label">Temporada</div><div id="miniStand" class="miniStand"><div class="muted small">Aún no hay clasificación.</div></div></div>
- </div>
- <div class="grid g4">
-  <div class="card"><div class="label">Estado</div><div class="kpi" id="dState">Preparación</div><div class="muted small" id="dStateSub">Crea una competición.</div></div>
-  <div class="card"><div class="label">Jugadores activos</div><div class="kpi" id="dPlayers">0</div><div class="muted small">en todos los clubes</div></div>
-  <div class="card"><div class="label">Partidos históricos</div><div class="kpi" id="dGames">0</div><div class="muted small">Liga + Copa</div></div>
-  <div class="card"><div class="label">Retirados</div><div class="kpi" id="dRetired">0</div><div class="muted small">carreras archivadas</div></div>
- </div>
- <div class="grid g2" style="margin-top:14px"><div class="card"><h3>Situación actual</h3><div id="dCurrent" class="empty">Aún no hay competición.</div></div><div class="card"><h3>Noticias del universo</h3><div id="newsFeed" class="empty">El mundo aún no ha comenzado.</div></div></div>
-</div>
-
-<div id="teams" class="view">
- <div class="hero"><div><h1>Clubes</h1><p id="clubEditorSubtitle">Diseña la estructura competitiva antes de crear el universo.</p></div><div class="actions"><button class="btn" id="addTeam">+ Añadir club</button><button class="btn" id="genTeams">🎲 Generar 16</button></div></div>
- <div id="clubSetupEditor">
-  <div class="editorToolbar"><div><b id="clubCountLabel">0 clubes activos</b><div class="muted tiny" id="clubEditorHint">Desmarca un club para dejarlo fuera del universo nuevo.</div></div><span class="scopeBadge" id="clubScopeBadge">Plantilla de nuevo universo</span></div>
-  <div class="card"><div class="teamrow label"><span></span><span>Club</span><span>OVR</span><span>ATA</span><span>DEF</span><span></span></div><div id="teamList"></div></div>
- </div>
- <div id="clubBrowser" class="clubBrowser">
-   <div class="editorToolbar"><div><b>Ficha de club</b><div class="muted tiny">Selecciona un escudo para explorar su historia completa.</div></div><select id="clubProfileSelect" style="width:auto;margin:0;min-width:220px"></select></div>
-   <div id="clubPicker" class="clubPicker"></div>
-   <div id="clubProfile"></div>
- </div>
-</div>
-
-<div id="players" class="view">
- <div class="hero"><div><h1>Plantillas</h1><p>Edita nombres y atributos; lesiones, edad y carrera sí afectan a la simulación.</p></div><div class="actions"><select id="playerTeamSelect" style="width:auto;margin:0;min-width:190px"></select><button class="btn" id="addPlayer">+ Crear jugador</button></div></div>
- <div class="editorToolbar"><div class="filters"><input id="playerSearch" placeholder="Buscar jugador…" aria-label="Buscar jugador"><select id="playerPosFilter"><option value="">Todas las posiciones</option><option>POR</option><option>DEF</option><option>MED</option><option>DEL</option></select><select id="playerStatusFilter"><option value="">Todos</option><option value="fit">Disponibles</option><option value="injured">Lesionados</option></select><select id="playerSort"><option value="pos">Orden: posición</option><option value="ovr">OVR ↓</option><option value="age">Edad ↑</option><option value="goals">Goles ↓</option></select></div><span class="badge" id="playerFilterCount">—</span></div>
- <div class="card">
-   <div id="squadSummary" class="small muted" style="margin-bottom:10px"></div>
-   <div class="playerrow label"><span>Nombre</span><span>Pos</span><span>Edad</span><span>OVR</span><span>Estado</span><span>Goles</span><span>Asist.</span><span>Valor</span></div>
-   <div id="playerList"></div>
- </div>
-</div>
-
-<div id="setup" class="view">
- <div class="hero"><div><h1>Configuración</h1><p>Elige cómo funciona tu universo.</p></div><div class="actions"><button class="btn primary" id="createWorld">Crear / reiniciar mundo</button></div></div>
- <div class="grid g2">
-  <div class="card"><h3>Competición</h3>
-   <div class="formrow"><label>Nombre<input id="worldName" value="Federación LeagueForge" maxlength="40"></label><label>Modo<select id="mode"><option value="ratings">Valoraciones</option><option value="equal">Todos iguales</option><option value="random">Azar total</option></select></label></div>
-   <div class="formrow"><label>Equipos en Primera<input id="topSize" type="number" min="4" max="20" value="8"></label><label>Ascensos / descensos<input id="movement" type="number" min="1" max="4" value="2"></label></div>
-   <div class="formrow"><label>Vueltas<select id="legs"><option value="1">1</option><option value="2" selected>2</option></select></label><label>Azar<select id="chaos"><option value=".65">Bajo</option><option value="1" selected>Normal</option><option value="1.45">Alto</option><option value="2">Caos</option></select></label></div>
-   <div class="formrow"><label>Ventaja local<select id="homeAdv"><option value="0">Ninguna</option><option value=".6">Baja</option><option value="1.2" selected>Normal</option><option value="2">Alta</option></select></label><label>Semilla<input id="seedInput" type="number" value="17117"></label></div>
-   <div class="modeGuide">
-      <div class="modeCard" data-mode-card="ratings"><b>🎯 Valoraciones</b><span>Plantilla, OVR, ATA, DEF y lesiones importan.</span></div>
-      <div class="modeCard" data-mode-card="equal"><b>⚖️ Igualados</b><span>Todos parten de la misma fuerza; manda la tirada.</span></div>
-      <div class="modeCard" data-mode-card="random"><b>🎲 Azar total</b><span>Ni ratings ni localía: puro caos estadístico.</span></div>
-     </div><div id="modeInfo" class="muted small"></div>
-  </div>
-  <div class="card"><h3>Estructura</h3><div id="setupInfo"></div><div class="muted small" style="margin-top:10px">La Copa incluye a todos los clubes activos. Al final de cada temporada se abre el mercado antes de permitir el inicio de la siguiente. En VM 1.3, la posición final reparte premios; las plantillas caras y las tesorerías grandes pagan más. Quedar arriba importa, pero el dinero no crece indefinidamente.</div><div class="systemTools"><div class="label">Diagnóstico</div><div class="muted tiny" style="margin:4px 0 9px">La suite guarda tu partida, prueba el motor y la restaura.</div><button class="btn" id="runTestsBtn">🧪 Ejecutar tests VM 1.3</button></div></div>
- </div>
-</div>
-
-<div id="league" class="view">
- <div class="hero"><div><h1>Liga</h1><p>Marca el ritmo: partido a partido, siguiendo un club o jornada completa.</p></div><div class="actions"><button class="btn primary" id="simLeagueNext">▶ Siguiente partido</button><button class="btn" id="simLeagueRound">📅 Jornada de esta división</button><button class="btn" id="simLeagueAll">⏩ Completar esta división</button></div></div>
- <div class="tabs"><button class="tab active" data-div="d1">Primera</button><button class="tab" data-div="d2">Segunda</button></div>
- <div class="matchdayTools"><div class="left"><span class="label">Seguir club</span><select id="matchTeamSelect"></select><button class="btn" id="simTeamMatch">⚽ Simular su partido</button></div><div class="right"><span class="muted tiny">También puedes simular cualquier encuentro desde su propia tarjeta.</span></div></div>
- <div id="leagueReveal" class="resultReveal" style="display:none"></div>
- <div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px"><h3 id="leagueTitle" style="margin:0">Sin competición</h3><span class="badge" id="leagueBadge">—</span></div><div id="leagueFixtures" class="empty">Crea un mundo.</div><div id="leagueLastResults" class="lastResults" style="display:none"></div></div>
-</div>
-
-<div id="cup" class="view">
- <div class="hero"><div><h1>Copa</h1><p>Revela cada eliminatoria una a una o resuelve la ronda completa.</p></div><div class="actions"><button class="btn cup" id="simCupNext">▶ Siguiente cruce</button><button class="btn cup" id="simCupRound">🏆 Ronda completa</button><button class="btn cup" id="simCupAll">⏩ Completar Copa</button></div></div>
- <div id="cupReveal" class="resultReveal" style="display:none"></div>
- <div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px"><h3 id="cupTitle" style="margin:0">Copa</h3><span class="badge" id="cupBadge">—</span></div><div id="cupView" class="empty">Sin Copa.</div><div id="cupLastResults" class="lastResults" style="display:none"></div></div>
-</div>
-
-<div id="tables" class="view">
- <div class="hero"><div><h1>Clasificaciones</h1><p>Las plazas verdes ascienden; las rojas descienden.</p></div></div>
- <div class="tableLegend"><span><i class="legendMark title"></i>Campeón</span><span><i class="legendMark up"></i>Ascenso</span><span><i class="legendMark down"></i>Descenso</span><span>Orden: puntos → DG → GF</span></div><div class="grid g2"><div class="card tablewrap"><h3>Primera</h3><table><thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead><tbody id="tableD1"></tbody></table></div><div class="card tablewrap"><h3>Segunda</h3><table><thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead><tbody id="tableD2"></tbody></table></div></div>
-</div>
-
-<div id="stats" class="view">
- <div class="hero"><div><h1>Estadísticas individuales</h1><p>Goleadores, asistentes y disponibilidad.</p></div></div>
- <div class="grid g3"><div class="card tablewrap"><h3>⚽ Goleadores</h3><table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>G</th></tr></thead><tbody id="scorers"></tbody></table></div><div class="card tablewrap"><h3>🎯 Asistencias</h3><table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>A</th></tr></thead><tbody id="assists"></tbody></table></div><div class="card"><h3>🏥 Lesionados</h3><div id="injuries"></div></div></div>
-</div>
-
-<div id="market" class="view">
- <div class="hero"><div><h1>Mercado entre temporadas</h1><p>Configura la lógica del mercado o deja a la IA resolver el verano.</p></div><div class="actions"><button class="btn warn" id="generateOffers">🔄 Nuevas propuestas</button><button class="btn primary" id="autoMarket">🤖 Mercado automático</button><button class="btn good" id="closeMarket">Cerrar mercado e iniciar temporada</button></div></div>
- <div id="draftPanel" class="draftPanel" style="display:none"></div>
- <div class="marketRules">
-   <button class="marketRule active" type="button" data-market-mode="coherent"><b>🧠 Coherente</b><span>Clubes fichan según nivel, necesidades, presupuesto, ascensos y descensos.</span></button>
-   <button class="marketRule" type="button" data-market-mode="chaos"><b>🎲 Caos</b><span>Operaciones imprevisibles, pero con diversidad para evitar monopolios.</span></button>
-   <div class="marketRule"><b>🛡️ Diversidad</b><span>Compradores y vendedores rotan: nunca 3 seguidos ni más de 2 veces en las últimas 5 propuestas.</span></div>
-   <div class="marketRule"><b>👥 Plantillas</b><span>Topes por posición, máximo 25 jugadores y hasta 5 entradas/salidas por verano (6 entradas si asciende).</span></div>
- </div>
- <div id="marketMemory" class="marketMemory">El historial corto de propuestas aparecerá aquí.</div>
- <div id="marketBalanceSummary" class="marketMemory">Economía y equilibrio del mercado aparecerán aquí.</div>
- <div class="marketSummary"><div class="marketMetric"><span>Propuestas</span><b id="marketOfferCount">0</b></div><div class="marketMetric"><span>Traspasos cerrados</span><b id="marketDoneCount">0</b></div><div class="marketMetric"><span>Gasto total</span><b id="marketSpend">0M</b></div><div class="marketMetric"><span>Temporada siguiente</span><b id="marketNextSeason">—</b></div></div>
- <div class="grid g2">
-  <div class="card"><h3>Propuestas pendientes</h3><div id="offerList"></div></div>
-  <div class="card"><h3>Proponer traspaso</h3>
-   <label>Club vendedor<select id="sellerSelect"></select></label><div style="height:8px"></div>
-   <label>Jugador<select id="marketPlayerSelect"></select></label><div style="height:8px"></div>
-   <label>Club comprador<select id="buyerSelect"></select></label><div style="height:8px"></div>
-   <label>Oferta (M)<input id="customFee" type="number" min="0" step=".1" value="10"></label>
-   <div id="marketValuation" class="valuation">Selecciona un jugador para ver su valoración orientativa.</div><button class="btn primary" id="proposeTransfer" style="margin-top:10px">Añadir propuesta</button>
-   <div class="muted tiny" style="margin-top:8px">Las propuestas manuales siguen necesitando tu aprobación. El mercado automático usa el modo seleccionado arriba.</div>
-  </div>
- </div>
- <div class="card" style="margin-top:14px"><h3>Movimientos de este verano</h3><div id="transferLog"></div><div id="autoMarketLog" class="autoMarketLog" style="display:none"></div></div>
-</div>
-
-<div id="history" class="view">
- <div class="hero"><div><h1>Historia y palmarés</h1><p>Tablas finales, campeones, finalistas, ascensos, descensos y archivo completo.</p></div><div class="saveTools"><button class="btn" id="saveBtn">💾 Guardar ahora</button><button class="btn" id="loadBtn">↺ Cargar último</button><button class="btn" id="exportBtn">Exportar JSON</button><button class="btn" id="importBtn">Importar JSON</button><input id="importFile" type="file" accept="application/json,.json"></div></div>
- <div class="palmaresGrid">
-   <div class="card"><h3>🏆 Palmarés de clubes</h3><div id="palmaresTable"></div></div>
-   <div class="card"><h3>📌 Grandes hitos</h3><div id="historyHighlights"></div></div>
- </div>
- <div id="seasonArchive"></div>
-</div>
-
-<div id="records" class="view">
- <div class="hero"><div><h1>Récords</h1><p>Marcas de clubes, partidos y jugadores.</p></div></div>
- <div class="grid g2"><div class="card"><h3>Clubes</h3><div id="clubRecords"></div></div><div class="card"><h3>Partidos</h3><div id="matchRecords"></div></div><div class="card"><h3>Jugadores — temporada</h3><div id="seasonPlayerRecords"></div></div><div class="card"><h3>Jugadores — carrera</h3><div id="careerRecords"></div></div></div>
-</div>
-
-<div id="hof" class="view">
- <div class="hero"><div><h1>Hall of Fame</h1><p>Las mejores carreras, incluidos jugadores ya retirados.</p></div></div>
- <div class="grid g2"><div class="card"><h3>Leyendas</h3><div id="hofList"></div></div><div class="card"><h3>Rivalidades</h3><div id="rivalries"></div></div></div>
-</div>
-
-</section></main>
-
-<div class="vm-more-backdrop" id="vmMoreBackdrop" aria-hidden="true"><div class="vm-more-sheet"><div class="vm-sheet-handle"></div><div class="vm-more-head"><b>Más</b><button class="btn" id="vmCloseMore" type="button">Cerrar</button></div><div class="vm-more-grid">
-<button class="vm-more-item" data-vm-view="cup" type="button">🏆 Copa<span>Eliminatorias y final</span></button>
-<button class="vm-more-item" data-vm-view="teams" type="button">🛡️ Clubes<span>Fichas, palmarés y entrenadores</span></button>
-<button class="vm-more-item" data-vm-view="players" type="button">👥 Plantillas<span>Jugadores y carreras</span></button>
-<button class="vm-more-item" data-vm-view="stats" type="button">⚽ Rendimiento<span>Goles, asistencias y lesiones</span></button>
-<button class="vm-more-item" data-vm-view="history" type="button">📚 Historia<span>Temporadas y palmarés</span></button>
-<button class="vm-more-item" data-vm-view="records" type="button">👑 Récords<span>Clubes y jugadores</span></button>
-<button class="vm-more-item" data-vm-view="hof" type="button">🌟 Hall of Fame<span>Leyendas y rivalidades</span></button>
-<button class="vm-more-item" data-vm-view="setup" type="button">⚙️ Configuración<span>Reglas, modos y backup</span></button>
-</div><div class="vm-storage" id="vmStorageInfo">Guardado local: comprobando…</div></div></div>
-<nav class="vm-tabbar" aria-label="Navegación principal">
-<button class="vm-tab active" data-vm-view="dashboard" type="button"><span class="ico">⌂</span><span>Inicio</span></button>
-<button class="vm-tab" data-vm-view="league" type="button"><span class="ico">⚽</span><span>Jugar</span></button>
-<button class="vm-tab" data-vm-view="tables" type="button"><span class="ico">▤</span><span>Tabla</span></button>
-<button class="vm-tab" data-vm-view="market" type="button"><span class="ico">⇄</span><span>Mercado</span></button>
-<button class="vm-tab" id="vmMoreBtn" type="button"><span class="ico">•••</span><span>Más</span></button>
-</nav>
-
-<div class="toast" id="toast"></div>
-</div>
-
-<script>
 (()=>{
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -799,12 +287,12 @@ function processAgingAndRetirements(){
  }
 }
 function leastCoveredPosition(t){let c={POR:0,DEF:0,MED:0,DEL:0};t.players.forEach(p=>c[p.pos]++);return [...POS].sort((a,b)=>(c[a]/POS_COUNTS[a])-(c[b]/POS_COUNTS[b]))[0]}
-function openMarket(){world.phase='market';world.offseason={fromD1:[...world.season.d1ids],fromD2:[...world.season.d2ids]};world.offers=[];world.transferLog=[];generateOffers(12);autosave('market open');if(!TESTING)renderAll()}
+function openMarket(){world.phase='market';world.offseason={fromD1:[...world.season.d1ids],fromD2:[...world.season.d2ids]};world.offers=[];world.transferLog=[];generateOffers(8);autosave('market open');if(!TESTING)renderAll()}
 function saleBlockReason(seller,p){if(!seller||!p)return'Operación inválida';if(seller.players.length<=16)return'El club debe conservar al menos 16 jugadores';if(p.pos==='POR'&&seller.players.filter(x=>x.pos==='POR').length<=1)return'El club debe conservar al menos un portero';return null}
 function ensureSquadDepth(t){while(t.players.filter(p=>p.pos==='POR').length<2)t.players.push(makePlayer(t.id,'POR',Math.max(58,t.ovr-9),17+ri(3)));while(t.players.length<18)t.players.push(makePlayer(t.id,leastCoveredPosition(t),Math.max(58,t.ovr-8),17+ri(3)))}
 function transferPlayer(playerId,buyerId,fee){
  const seller=world.teams.find(t=>t.players.some(p=>p.id===playerId)),buyer=team(buyerId);if(!seller||!buyer||seller.id===buyer.id)return false;const p=seller.players.find(x=>x.id===playerId);if(buyer.budget<fee||saleBlockReason(seller,p))return false;
- seller.players=seller.players.filter(x=>x.id!==playerId);buyer.players.push(p);p.teamId=buyer.id;buyer.budget=Math.round((buyer.budget-fee)*10)/10;seller.budget=Math.round(clamp(seller.budget+fee,3,135)*10)/10;world.transferLog.unshift(`${p.name}: ${seller.name} → ${buyer.name} por ${fee.toFixed(1)}M`);autosave('transfer');return true;
+ seller.players=seller.players.filter(x=>x.id!==playerId);buyer.players.push(p);p.teamId=buyer.id;buyer.budget=Math.round((buyer.budget-fee)*10)/10;seller.budget=Math.round(clamp(seller.budget+fee,3,160)*10)/10;world.transferLog.unshift(`${p.name}: ${seller.name} → ${buyer.name} por ${fee.toFixed(1)}M`);autosave('transfer');return true;
 }
 function generateOffers(n=8){
  if(!world||world.phase!=='market')return;const clubs=world.teams;
@@ -1189,21 +677,17 @@ function generateOffers(n=8){
  autosave('offers');if(!TESTING)renderMarket();
 }
 function autoMarket(){
- if(!world||world.phase!=='market')return;const mode=marketMode(),before=world.transferRecords.length,live=!TESTING;if(live)TESTING=true;
- try{
-  // Resolve the proposals already on screen first instead of letting them block players/slots.
-  for(const o of world.offers.filter(x=>x.status==='pending')){const p=allPlayers().find(x=>x.id===o.playerId)||(world.freeAgents||[]).find(x=>x.id===o.playerId),v=p?playerValue(p):o.fee,accept=o.source==='freeAgent'||(mode==='chaos'?random()<.66:o.fee<=v*1.18);offerAction(o.id,accept)}
-  for(let wave=0;wave<5;wave++)for(const buyer of shuffle(world.teams)){if(buyer.budget<1||vm11SeasonTransfers(buyer.id,'in')>=vm11IncomingLimit(buyer))continue;const offer=makeMarketOffer(mode,buyer);if(!offer)continue;const p=allPlayers().find(x=>x.id===offer.playerId)||(world.freeAgents||[]).find(x=>x.id===offer.playerId),value=p?playerValue(p):offer.fee,reasonable=offer.source==='freeAgent'||(mode==='chaos'?random()<.70:offer.fee<=value*1.25);offerAction(offer.id,reasonable)}
-  for(let i=0;i<world.teams.length*2;i++){const o=makeMarketOffer(mode);if(!o)continue;const p=allPlayers().find(x=>x.id===o.playerId)||(world.freeAgents||[]).find(x=>x.id===o.playerId),v=p?playerValue(p):o.fee;offerAction(o.id,o.source==='freeAgent'||(mode==='chaos'?random()<.52:o.fee<=v*1.12))}
- }finally{if(live)TESTING=false}
- const done=world.transferRecords.length-before;if($('#autoMarketLog')){$('#autoMarketLog').style.display='block';$('#autoMarketLog').textContent=`Mercado automático: ${done} operaciones. Máximo: 5 entradas/salidas por club (6 entradas si asciende), sujeto a posiciones y presupuesto.`}autosave('auto market');if(!TESTING)renderMarket();
+ if(!world||world.phase!=='market')return;const mode=marketMode(),before=world.transferRecords.length,clubs=shuffle(world.teams);
+ for(const buyer of clubs){if(buyer.budget<1)continue;let offer=makeMarketOffer(mode,buyer);if(!offer)continue;const p=allPlayers().find(x=>x.id===offer.playerId),value=p?playerValue(p):offer.fee,reasonable=mode==='chaos'?random()<.72:offer.fee<=value*1.2;if(reasonable){offerAction(offer.id,true)}else offerAction(offer.id,false)}
+ const targetExtra=Math.floor(world.teams.length/3);for(let i=0;i<targetExtra;i++){const o=makeMarketOffer(mode);if(o){const p=allPlayers().find(x=>x.id===o.playerId),v=p?playerValue(p):o.fee;if(mode==='chaos'?random()<.55:o.fee<=v*1.12)offerAction(o.id,true);else offerAction(o.id,false)}}
+ const done=world.transferRecords.length-before;if($('#autoMarketLog')){$('#autoMarketLog').style.display='block';$('#autoMarketLog').textContent=`Mercado automático: ${done} operaciones completadas usando modo ${mode==='coherent'?'Coherente':'Caos'}.`}autosave('auto market');if(!TESTING)renderMarket();
 }
 function transferPlayer(playerId,buyerId,fee){
  const seller=world.teams.find(t=>t.players.some(p=>p.id===playerId)),buyer=team(buyerId);if(!seller||!buyer||seller.id===buyer.id)return false;const p=seller.players.find(x=>x.id===playerId);if(buyer.budget<fee||saleBlockReason(seller,p))return false;
- seller.players=seller.players.filter(x=>x.id!==playerId);buyer.players.push(p);vm13ResolveIncomingRoster(buyer,p);p.transferHistory=p.transferHistory||[];p.transferHistory.push({season:world.season.no,from:seller.id,to:buyer.id,fee});p.teamId=buyer.id;clubBucket(p,buyer.id);buyer.budget=Math.round((buyer.budget-fee)*10)/10;seller.budget=Math.round(clamp(seller.budget+fee,3,135)*10)/10;
+ seller.players=seller.players.filter(x=>x.id!==playerId);buyer.players.push(p);p.transferHistory=p.transferHistory||[];p.transferHistory.push({season:world.season.no,from:seller.id,to:buyer.id,fee});p.teamId=buyer.id;clubBucket(p,buyer.id);buyer.budget=Math.round((buyer.budget-fee)*10)/10;seller.budget=Math.round(clamp(seller.budget+fee,3,160)*10)/10;
  const rec={season:world.season.no,playerId:p.id,playerName:p.name,sellerId:seller.id,sellerName:seller.name,buyerId:buyer.id,buyerName:buyer.name,fee};world.transferRecords.push(rec);world.transferLog.unshift(`${p.name}: ${seller.name} → ${buyer.name} por ${fee.toFixed(1)}M`);autosave('transfer');return true;
 }
-function openMarket(){world.phase='market';world.offseason={fromD1:[...world.season.d1ids],fromD2:[...world.season.d2ids]};world.offers=[];world.transferLog=[];world.marketMemory={recentBuyers:[],offerCount:{},recentSellers:[]};generateOffers(12);autosave('market open');if(!TESTING)renderAll()}
+function openMarket(){world.phase='market';world.offseason={fromD1:[...world.season.d1ids],fromD2:[...world.season.d2ids]};world.offers=[];world.transferLog=[];world.marketMemory={recentBuyers:[],offerCount:{},recentSellers:[]};generateOffers(8);autosave('market open');if(!TESTING)renderAll()}
 function startNextSeason(){
  if(!world||world.phase!=='market')return;world.teams.forEach(ensureSquadDepth);
  world.marketHistory.push({afterSeason:world.season.no,mode:marketMode(),transfers:world.transferRecords.filter(x=>x.season===world.season.no).map(x=>({...x}))});
@@ -1389,9 +873,12 @@ function vm11ClubPrestige(t){
  recent.forEach(r=>{score+=r.div==='Primera'?Math.max(0,10-r.pos*1.2):Math.max(0,4-r.pos*.45)});
  return clamp(score,35,90);
 }
-function vm11IncomingLimit(t){return wasPromoted(t.id)?6:5}
+function vm11IncomingLimit(t){return wasPromoted(t.id)?3:2}
 function vm11OutgoingLimit(t){
- return 5;
+ const surplus=Math.max(0,t.players.length-VM11_ROSTER.minTotal);
+ if(wasPromoted(t.id))return Math.min(1,Math.max(1,surplus));
+ if(wasRelegated(t.id))return Math.min(2,Math.max(1,surplus));
+ return Math.min(2,Math.max(1,surplus));
 }
 function vm11SeasonTransfers(teamId,dir){
  return (world.transferRecords||[]).filter(x=>x.season===world.season.no&&(dir==='in'?x.buyerId===teamId:x.sellerId===teamId)).length;
@@ -1400,11 +887,11 @@ function vm11PendingCount(teamId,dir){
  return (world.offers||[]).filter(o=>o.status==='pending'&&(dir==='in'?o.buyerId===teamId:o.sellerId===teamId)).length;
 }
 function vm11BuyerCapacity(t,p){
- if(!t||!p)return false;if(vm11SeasonTransfers(t.id,'in')>=vm11IncomingLimit(t))return false;
- if(t.players.length<VM11_ROSTER.maxTotal&&vm11PosCount(t,p.pos)<VM11_ROSTER[p.pos].max)return true;
- if(vm11PosCount(t,p.pos)>=VM11_ROSTER[p.pos].max&&t.players.some(x=>x.pos===p.pos&&!x.retired))return true;
- if(t.players.length>=VM11_ROSTER.maxTotal&&t.players.some(x=>vm11PosCount(t,x.pos)>VM11_ROSTER[x.pos].min))return true;
- return false;
+ if(!t||!p)return false;
+ if(t.players.length>=VM11_ROSTER.maxTotal)return false;
+ if(vm11PosCount(t,p.pos)>=VM11_ROSTER[p.pos].max)return false;
+ if(vm11SeasonTransfers(t.id,'in')>=vm11IncomingLimit(t))return false;
+ return true;
 }
 function vm11SellerCapacity(t,p){
  if(!t||!p)return false;
@@ -1511,7 +998,7 @@ function makeMarketOffer(mode=marketMode(),forcedBuyer=null){
 }
 function vm11ReleasePlayer(t,p,reason='exceso de plantilla'){
  t.players=t.players.filter(x=>x.id!==p.id);p.teamId=null;p.injury=0;p.releaseInfo={season:world.season.no,from:t.id,reason};world.freeAgents=world.freeAgents||[];world.freeAgents.push(p);
- const relief=Math.max(.2,Math.round(playerValue(p)*.05*10)/10);t.budget=Math.round(clamp(t.budget+relief,3,135)*10)/10;
+ const relief=Math.max(.2,Math.round(playerValue(p)*.05*10)/10);t.budget=Math.round(clamp(t.budget+relief,3,160)*10)/10;
  world.transferLog.unshift(`🆓 ${p.name} sale de ${t.name} como agente libre (${reason}; +${relief.toFixed(1)}M de margen)`);
 }
 function vm11TrimRoster(t){
@@ -1523,15 +1010,9 @@ function vm11TrimRoster(t){
   const candidates=t.players.filter(p=>vm11PosCount(t,p.pos)>VM11_ROSTER[p.pos].min).sort((a,b)=>a.ovr-b.ovr||b.age-a.age);if(!candidates.length)break;vm11ReleasePlayer(t,candidates[0],'plantilla superior a 25');
  }
 }
-function vm13ResolveIncomingRoster(t,incoming){
- const released=[];
- while(vm11PosCount(t,incoming.pos)>VM11_ROSTER[incoming.pos].max){const cand=t.players.filter(x=>x.id!==incoming.id&&x.pos===incoming.pos).sort((a,b)=>a.ovr-b.ovr||b.age-a.age)[0];if(!cand)break;released.push(cand);vm11ReleasePlayer(t,cand,`reemplazo tras fichaje de ${incoming.pos}`)}
- while(t.players.length>VM11_ROSTER.maxTotal){const cand=t.players.filter(x=>x.id!==incoming.id&&vm11PosCount(t,x.pos)>VM11_ROSTER[x.pos].min).sort((a,b)=>a.ovr-b.ovr||b.age-a.age)[0];if(!cand)break;released.push(cand);vm11ReleasePlayer(t,cand,'ajuste de plantilla tras fichaje')}
- return released;
-}
 function vm11SignFreeAgent(t,p,fee=0){
  if(!p||!vm11BuyerCapacity(t,p)||t.budget<fee)return false;
- world.freeAgents=(world.freeAgents||[]).filter(x=>x.id!==p.id);t.players.push(p);p.teamId=t.id;clubBucket(p,t.id);vm13ResolveIncomingRoster(t,p);p.transferHistory=p.transferHistory||[];p.transferHistory.push({season:world.season.no,from:null,to:t.id,fee,freeAgent:true});t.budget=Math.round((t.budget-fee)*10)/10;
+ world.freeAgents=(world.freeAgents||[]).filter(x=>x.id!==p.id);t.players.push(p);p.teamId=t.id;clubBucket(p,t.id);p.transferHistory=p.transferHistory||[];p.transferHistory.push({season:world.season.no,from:null,to:t.id,fee,freeAgent:true});t.budget=Math.round((t.budget-fee)*10)/10;
  world.transferRecords.push({season:world.season.no,playerId:p.id,playerName:p.name,sellerId:null,sellerName:'Agente libre',buyerId:t.id,buyerName:t.name,fee,freeAgent:true});
  world.transferLog.unshift(`${p.name}: agente libre → ${t.name} por ${fee.toFixed(1)}M`);return true;
 }
@@ -1555,21 +1036,20 @@ function transferPlayer(playerId,buyerId,fee){
  if(!seller){const p=(world.freeAgents||[]).find(x=>x.id===playerId);return vm11SignFreeAgent(buyer,p,fee)}
  if(seller.id===buyer.id)return false;const p=seller.players.find(x=>x.id===playerId);
  if(buyer.budget<fee||saleBlockReason(seller,p)||!vm11BuyerCapacity(buyer,p))return false;
- seller.players=seller.players.filter(x=>x.id!==playerId);buyer.players.push(p);vm13ResolveIncomingRoster(buyer,p);p.transferHistory=p.transferHistory||[];p.transferHistory.push({season:world.season.no,from:seller.id,to:buyer.id,fee});p.teamId=buyer.id;clubBucket(p,buyer.id);buyer.budget=Math.round((buyer.budget-fee)*10)/10;seller.budget=Math.round(clamp(seller.budget+fee,3,135)*10)/10;
+ seller.players=seller.players.filter(x=>x.id!==playerId);buyer.players.push(p);p.transferHistory=p.transferHistory||[];p.transferHistory.push({season:world.season.no,from:seller.id,to:buyer.id,fee});p.teamId=buyer.id;clubBucket(p,buyer.id);buyer.budget=Math.round((buyer.budget-fee)*10)/10;seller.budget=Math.round(clamp(seller.budget+fee,3,160)*10)/10;
  const rec={season:world.season.no,playerId:p.id,playerName:p.name,sellerId:seller.id,sellerName:seller.name,buyerId:buyer.id,buyerName:buyer.name,fee};world.transferRecords.push(rec);world.transferLog.unshift(`${p.name}: ${seller.name} → ${buyer.name} por ${fee.toFixed(1)}M`);autosave('transfer');return true;
 }
-function vm11OperatingCost(t){
- const squad=vm11SquadValue(t),base=8+squad*.07+Math.max(0,t.players.length-22)*.75,luxury=Math.max(0,squad-430)*.035;
- return Math.round((base+luxury)*10)/10
-}
+function vm11OperatingCost(t){return Math.round((6+vm11SquadValue(t)*.055+Math.max(0,t.players.length-22)*.6)*10)/10}
 function vm11PrizeFor(row,div,total){
- const ratio=total<=1?1:(total-row.pos)/(total-1);return div==='d1'?24+ratio*24:12+ratio*16;
+ const ratio=total<=1?1:(total-row.pos)/(total-1);
+ return div==='d1'?28+ratio*28:14+ratio*18;
 }
-function vm13TreasuryCost(t){return Math.round(Math.max(0,t.budget-65)*.16*10)/10}
 function vm11AwardFinances(d1,d2,cupWinnerId,cupFinalistId){
- const awards={},calc=(rows,div)=>rows.forEach((r,i)=>{const t=team(r.id),pos=i+1;awards[t.id]={division:div,pos,prize:vm11PrizeFor({pos},div,rows.length),bonus:0,cost:vm11OperatingCost(t),treasuryCost:vm13TreasuryCost(t)}});calc(d1,'d1');calc(d2,'d2');
- const promoted=new Set(d2.slice(0,world.config.movement).map(x=>x.id)),relegated=new Set(d1.slice(-world.config.movement).map(x=>x.id));promoted.forEach(id=>awards[id].bonus+=8);relegated.forEach(id=>awards[id].bonus+=7);if(awards[cupWinnerId])awards[cupWinnerId].bonus+=9;if(cupFinalistId&&awards[cupFinalistId])awards[cupFinalistId].bonus+=4;
- for(const t of world.teams){const a=awards[t.id];if(!a)continue;const delta=a.prize+a.bonus-a.cost-a.treasuryCost;t.budget=Math.round(clamp(t.budget+delta,3,135)*10)/10;a.delta=Math.round(delta*10)/10;a.after=t.budget}
+ const awards={},calc=(rows,div)=>rows.forEach((r,i)=>{const t=team(r.id),pos=i+1;awards[t.id]={division:div,pos,prize:vm11PrizeFor({pos},div,rows.length),bonus:0,cost:vm11OperatingCost(t)}});
+ calc(d1,'d1');calc(d2,'d2');
+ const promoted=new Set(d2.slice(0,world.config.movement).map(x=>x.id)),relegated=new Set(d1.slice(-world.config.movement).map(x=>x.id));
+ promoted.forEach(id=>awards[id].bonus+=8);relegated.forEach(id=>awards[id].bonus+=6);if(awards[cupWinnerId])awards[cupWinnerId].bonus+=10;if(cupFinalistId&&awards[cupFinalistId])awards[cupFinalistId].bonus+=4;
+ for(const t of world.teams){const a=awards[t.id];if(!a)continue;const delta=a.prize+a.bonus-a.cost;t.budget=Math.round(clamp(t.budget+delta,3,160)*10)/10;a.delta=Math.round(delta*10)/10;a.after=t.budget}
  world.financeHistory=world.financeHistory||[];world.financeHistory.push({season:world.season.no,awards});world.season.finance={awards};return awards;
 }
 function finalizeSeason(){
@@ -1583,27 +1063,19 @@ function finalizeSeason(){
  vm11AwardFinances(d1,d2,cup.id,finalist?.id||null);world.season.finalized=true;world.news.unshift(`🏆 ${champ.name} conquista la Liga. ${cup.name} gana la Copa.`);processAgingAndRetirements();runDraft(d1,d2);openMarket();
 }
 function processAgingAndRetirements(){
- world.freeAgents=world.freeAgents||[];
- for(const p of world.freeAgents){p.age++;if(p.age>=31)p.ovr=clamp(p.ovr-ri(2),40,96)}
- world.freeAgents=world.freeAgents.filter(p=>p.age<37).sort((a,b)=>playerValue(b)-playerValue(a)).slice(0,110);
- for(const t of world.teams){const cm=coachModifiers(t);
-  for(const p of [...t.players]){p.career.seasons++;clubBucket(p,t.id).seasons++;p.age++;if(p.age<=23)p.ovr=clamp(p.ovr+(random()<(.65+cm.youth)?ri(3):0),40,96);else if(p.age>=31)p.ovr=clamp(p.ovr-ri(3),40,96);const retire=p.age>=39||(p.age>=36&&random()<.55)||(p.age>=34&&random()<.20);if(retire){p.retired=true;world.retired.push(structuredClone(p));t.players=t.players.filter(x=>x.id!==p.id);world.news.unshift(`👋 ${p.name} se retira a los ${p.age} años.`)}}
-  for(const pos of POS)while(vm11PosCount(t,pos)<VM11_ROSTER[pos].min){const y=makePlayer(t.id,pos,Math.max(58,t.ovr-9),17+ri(4));t.players.push(y);world.news.unshift(`🌱 ${t.name} incorpora al canterano ${y.name}.`)}
-  while(t.players.length<VM11_ROSTER.minTotal){const pos=leastCoveredPosition(t),y=makePlayer(t.id,pos,Math.max(58,t.ovr-8),17+ri(3));t.players.push(y);world.news.unshift(`🌱 ${t.name} incorpora al canterano ${y.name}.`)}
- }
+ for(const t of world.teams){const cm=coachModifiers(t);for(const p of [...t.players]){p.career.seasons++;clubBucket(p,t.id).seasons++;p.age++;if(p.age<=23)p.ovr=clamp(p.ovr+(random()<(.65+cm.youth)?ri(3):0),40,96);else if(p.age>=31)p.ovr=clamp(p.ovr-ri(3),40,96);const retire=p.age>=39||(p.age>=36&&random()<.55)||(p.age>=34&&random()<.20);if(retire){p.retired=true;world.retired.push(structuredClone(p));t.players=t.players.filter(x=>x.id!==p.id);world.news.unshift(`👋 ${p.name} se retira a los ${p.age} años.`)}}while(t.players.length<VM11_ROSTER.minTotal){const pos=leastCoveredPosition(t),y=makePlayer(t.id,pos,Math.max(58,t.ovr-8),17+ri(3));t.players.push(y);world.news.unshift(`🌱 ${t.name} incorpora al canterano ${y.name}.`)}}}
+function openMarket(){
+ world.phase='market';world.freeAgents=world.freeAgents||[];world.offseason={fromD1:[...world.season.d1ids],fromD2:[...world.season.d2ids]};world.offers=[];world.transferLog=[];world.marketMemory={recentBuyers:[],offerCount:{},recentSellers:[],sellerOfferCount:{}};world.teams.forEach(vm11TrimRoster);generateOffers(8);autosave('market open');if(!TESTING)renderAll()
 }
 function startNextSeason(){
  if(!world||world.phase!=='market')return;world.teams.forEach(vm11FillSquad);world.marketHistory.push({afterSeason:world.season.no,mode:marketMode(),count:world.transferRecords.filter(x=>x.season===world.season.no).length,spend:Math.round(world.transferRecords.filter(x=>x.season===world.season.no).reduce((a,x)=>a+x.fee,0)*10)/10});
  const m=world.config.movement,d1=sortedFromArchive('d1'),d2=sortedFromArchive('d2'),rel=d1.slice(-m).map(x=>x.id),pro=d2.slice(0,m).map(x=>x.id),newD1=world.offseason.fromD1.filter(id=>!rel.includes(id)).concat(pro),newD2=world.offseason.fromD2.filter(id=>!pro.includes(id)).concat(rel);world.phase='season';initSeason(world.season.no+1,newD1,newD2);world.news.unshift(`📅 Comienza la temporada ${world.season.no}.`);autosave('new season');if(!TESTING){renderAll();switchView('dashboard');note('Nueva temporada iniciada')};
 }
 function autoMarket(){
- if(!world||world.phase!=='market')return;const mode=marketMode(),before=world.transferRecords.length,live=!TESTING;if(live)TESTING=true;
- try{
-  for(const o of world.offers.filter(x=>x.status==='pending')){const p=allPlayers().find(x=>x.id===o.playerId)||(world.freeAgents||[]).find(x=>x.id===o.playerId),v=p?playerValue(p):o.fee,accept=o.source==='freeAgent'||(mode==='chaos'?random()<.66:o.fee<=v*1.18);offerAction(o.id,accept)}
-  for(let wave=0;wave<2;wave++)for(const buyer of shuffle(world.teams)){if(buyer.budget<1||vm11SeasonTransfers(buyer.id,'in')>=vm11IncomingLimit(buyer))continue;const offer=makeMarketOffer(mode,buyer);if(!offer)continue;const p=allPlayers().find(x=>x.id===offer.playerId)||(world.freeAgents||[]).find(x=>x.id===offer.playerId),value=p?playerValue(p):offer.fee,reasonable=offer.source==='freeAgent'||(mode==='chaos'?random()<.70:offer.fee<=value*1.25);offerAction(offer.id,reasonable)}
-  for(let i=0;i<Math.ceil(world.teams.length/2);i++){const o=makeMarketOffer(mode);if(!o)continue;const p=allPlayers().find(x=>x.id===o.playerId)||(world.freeAgents||[]).find(x=>x.id===o.playerId),v=p?playerValue(p):o.fee;offerAction(o.id,o.source==='freeAgent'||(mode==='chaos'?random()<.52:o.fee<=v*1.12))}
- }finally{if(live)TESTING=false}
- const done=world.transferRecords.length-before;if($('#autoMarketLog')){$('#autoMarketLog').style.display='block';$('#autoMarketLog').textContent=`Mercado automático: ${done} operaciones. Máximo: 5 entradas/salidas por club (6 entradas si asciende), sujeto a posiciones y presupuesto.`}autosave('auto market');if(!TESTING)renderMarket();
+ if(!world||world.phase!=='market')return;const mode=marketMode(),before=world.transferRecords.length,clubs=shuffle(world.teams);
+ for(const buyer of clubs){if(buyer.budget<1||vm11SeasonTransfers(buyer.id,'in')>=vm11IncomingLimit(buyer))continue;let offer=makeMarketOffer(mode,buyer);if(!offer)continue;const p=allPlayers().find(x=>x.id===offer.playerId)||(world.freeAgents||[]).find(x=>x.id===offer.playerId),value=p?playerValue(p):offer.fee,reasonable=offer.source==='freeAgent'||(mode==='chaos'?random()<.68:offer.fee<=value*1.18);if(reasonable)offerAction(offer.id,true);else offerAction(offer.id,false)}
+ const targetExtra=Math.floor(world.teams.length/4);for(let i=0;i<targetExtra;i++){const o=makeMarketOffer(mode);if(o){const p=allPlayers().find(x=>x.id===o.playerId)||(world.freeAgents||[]).find(x=>x.id===o.playerId),v=p?playerValue(p):o.fee;if(o.source==='freeAgent'||(mode==='chaos'?random()<.5:o.fee<=v*1.1))offerAction(o.id,true);else offerAction(o.id,false)}}
+ const done=world.transferRecords.length-before;if($('#autoMarketLog')){$('#autoMarketLog').style.display='block';$('#autoMarketLog').textContent=`Mercado automático: ${done} operaciones completadas. Entradas máx. por club: 2 (3 si asciende); salidas máx.: 2.`}autosave('auto market');if(!TESTING)renderMarket();
 }
 function vm11CompactWorld(w){
  const x=structuredClone(w);x.news=(x.news||[]).slice(0,40);(x.history||[]).forEach(h=>{delete h.playerStats});(x.marketHistory||[]).forEach(h=>{if(h.transfers){h.count=h.transfers.length;h.spend=Math.round(h.transfers.reduce((a,z)=>a+(z.fee||0),0)*10)/10;delete h.transfers}});
@@ -1611,10 +1083,10 @@ function vm11CompactWorld(w){
  for(const p of (x.retired||[])){if(p.transferHistory?.length>8)p.transferHistory=p.transferHistory.slice(-8)}
  if(x.freeAgents?.length>80)x.freeAgents=x.freeAgents.sort((a,b)=>b.ovr-a.ovr).slice(0,80);return x;
 }
-function statePayload(){if(world)world.rngState=rngState;return{version:'5.3',client:'VM1.3',savedAt:Date.now(),nextTeamId,nextPlayerId,world:world?vm11CompactWorld(world):null,setup:world?null:{teams:structuredClone(teams)}}}
+function statePayload(){if(world)world.rngState=rngState;return{version:'5.2',client:'VM1.2',savedAt:Date.now(),nextTeamId,nextPlayerId,world:world?vm11CompactWorld(world):null,setup:world?null:{teams:structuredClone(teams)}}}
 function normalizeWorldV5(w){
  if(!w)return w;(w.teams||[]).forEach(ensureTeamV5);(w.retired||[]).forEach(p=>{p.clubCareer=p.clubCareer||{};p.transferHistory=p.transferHistory||[]});
- if(w.economyVersion!=='VM1.3'){for(const t of (w.teams||[])){const old=Number.isFinite(t.budget)?t.budget:25;t.budget=Math.round(clamp(25+Math.max(0,Math.min(old,160)-25)*.72,8,120)*10)/10}w.economyVersion='VM1.3'}
+ if(w.economyVersion!=='VM1.1'){for(const t of (w.teams||[]))t.budget=Math.round(Math.min(Number.isFinite(t.budget)?t.budget:25,150)*10)/10;w.economyVersion='VM1.1'}
  w.marketConfig=w.marketConfig||{mode:'coherent'};w.marketMemory=w.marketMemory||{recentBuyers:[],offerCount:{},recentSellers:[],sellerOfferCount:{}};w.marketMemory.sellerOfferCount=w.marketMemory.sellerOfferCount||{};w.transferRecords=w.transferRecords||[];w.marketHistory=w.marketHistory||[];w.draftHistory=w.draftHistory||[];w.freeAgents=w.freeAgents||[];w.financeHistory=w.financeHistory||[];w.history=w.history||[];w.history.forEach(h=>{h.d1=h.d1||[];h.d2=h.d2||[];delete h.playerStats;h.championId=h.championId||h.d1?.[0]?.id||null;h.lastSecondId=h.lastSecondId||h.d2?.[h.d2.length-1]?.id||null;if(!('cupFinalist' in h))h.cupFinalist=null;if(!('cupFinalistId' in h))h.cupFinalistId=null});return w;
 }
 function applySavedPayload(payload,announce='Partida cargada'){
@@ -1645,9 +1117,9 @@ function manualSave(){
 async function vm11CompactExistingStorage(){
  try{
   const all=await vmAll();if(!all.length)return;const latest=[...all].sort((a,b)=>b.savedAt-a.savedAt)[0];
-  if(latest?.payload?.world){const compact={version:'5.3',client:'VM1.3',savedAt:latest.payload.savedAt||Date.now(),nextTeamId:latest.payload.nextTeamId||nextTeamId,nextPlayerId:latest.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(latest.payload.world)),setup:null};await vmPut('autosave',compact,'Autosave migrado')}
-  const manual=all.find(x=>x.slot==='manual');if(manual?.payload?.world){const compact={version:'5.3',client:'VM1.3',savedAt:manual.payload.savedAt||Date.now(),nextTeamId:manual.payload.nextTeamId||nextTeamId,nextPlayerId:manual.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(manual.payload.world)),setup:null};await vmPut('manual',compact,'Manual migrado')}
-  const snaps=all.filter(x=>x.slot.startsWith('snap-')).sort((a,b)=>b.savedAt-a.savedAt);for(const rec of snaps.slice(0,2)){if(rec.payload?.world)await vmPut(rec.slot,{version:'5.3',client:'VM1.3',savedAt:rec.payload.savedAt||rec.savedAt||Date.now(),nextTeamId:rec.payload.nextTeamId||nextTeamId,nextPlayerId:rec.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(rec.payload.world)),setup:null},rec.label)}for(const rec of snaps.slice(2))await vm11Delete(rec.slot);
+  if(latest?.payload?.world){const compact={version:'5.2',client:'VM1.2',savedAt:latest.payload.savedAt||Date.now(),nextTeamId:latest.payload.nextTeamId||nextTeamId,nextPlayerId:latest.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(latest.payload.world)),setup:null};await vmPut('autosave',compact,'Autosave migrado')}
+  const manual=all.find(x=>x.slot==='manual');if(manual?.payload?.world){const compact={version:'5.2',client:'VM1.2',savedAt:manual.payload.savedAt||Date.now(),nextTeamId:manual.payload.nextTeamId||nextTeamId,nextPlayerId:manual.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(manual.payload.world)),setup:null};await vmPut('manual',compact,'Manual migrado')}
+  const snaps=all.filter(x=>x.slot.startsWith('snap-')).sort((a,b)=>b.savedAt-a.savedAt);for(const rec of snaps.slice(0,2)){if(rec.payload?.world)await vmPut(rec.slot,{version:'5.2',client:'VM1.2',savedAt:rec.payload.savedAt||rec.savedAt||Date.now(),nextTeamId:rec.payload.nextTeamId||nextTeamId,nextPlayerId:rec.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(rec.payload.world)),setup:null},rec.label)}for(const rec of snaps.slice(2))await vm11Delete(rec.slot);
   for(const key of [AUTO_SAVE_KEY,MANUAL_SAVE_KEY,LEGACY_SAVE_KEY,LEGACY_SAVE_KEY2]){try{const raw=localStorage.getItem(key);if(raw&&raw.length>3_500_000)localStorage.removeItem(key)}catch{}}
  }catch{}
 }
@@ -1663,10 +1135,9 @@ renderMarket=function(){
  for(const o of freeOffers){const p=(world.freeAgents||[]).find(x=>x.id===o.playerId),buyer=team(o.buyerId);if(!p||!buyer)continue;const value=playerValue(p),canPay=buyer.budget>=o.fee&&vm11BuyerCapacity(buyer,p),el=document.createElement('div');el.className='transfer';el.innerHTML=`<div class="transferPlayer"><span class="playerIcon">${p.pos}</span><div><b>${esc(p.name)}</b><div class="muted tiny">${p.age} años · OVR ${p.ovr} · valor ${value.toFixed(1)}M · 🆓</div></div></div><div><span class="muted tiny">Agente libre</span><div>→ <b>${esc(buyer.name)}</b></div><div class="muted tiny ${canPay?'':'budgetBad'}">Presupuesto: ${buyer.budget.toFixed(1)}M</div></div><div class="feeGood"><b>${o.fee.toFixed(1)}M</b><div class="muted tiny">Prima de fichaje</div></div><div class="marketActions"><button class="btn good ac" ${canPay?'':'disabled'}>Aceptar</button><button class="btn danger re">Rechazar</button></div>`;el.querySelector('.ac').addEventListener('click',()=>offerAction(o.id,true));el.querySelector('.re').addEventListener('click',()=>offerAction(o.id,false));root.appendChild(el)}
  const b=$('#marketBalanceSummary');if(b){const incoming=world.teams.reduce((a,t)=>a+vm11SeasonTransfers(t.id,'in'),0),outgoing=world.teams.reduce((a,t)=>a+vm11SeasonTransfers(t.id,'out'),0);b.textContent=`Plantillas: 18–25 jugadores · POR 2–3 · DEF 5–8 · MED 5–8 · DEL 3–6 · ${world.freeAgents?.length||0} agentes libres · ${incoming} entradas / ${outgoing} salidas cerradas.`}
 }
-function vm13Stagnation(t){let streak=0;for(let i=(world?.history?.length||0)-1;i>=0;i--){const h=world.history[i],d1=(h.d1||[]).find(x=>x.id===t.id),d2=(h.d2||[]).find(x=>x.id===t.id);if(d1||!d2)break;const pos=(h.d2||[]).findIndex(x=>x.id===t.id)+1;if(pos<=4)break;streak++}return{streak,active:streak>=7}}
 const vm11BaseRenderClubProfile=renderClubProfile;
 renderClubProfile=function(t){
- vm11BaseRenderClubProfile(t);if(!t)return;const rows=clubSeasonRows(t),d1=rows.filter(x=>x.div==='Primera'),d2=rows.filter(x=>x.div==='Segunda'),pts=rows.reduce((a,x)=>a+x.pts,0),gf=rows.reduce((a,x)=>a+x.gf,0),st=vm13Stagnation(t),box=$('#clubProfile .clubStatsGrid');if(box)box.insertAdjacentHTML('beforeend',`<div class="clubStat"><b>${d1.length}</b><span>Temp. Primera</span></div><div class="clubStat"><b>${d2.length}</b><span>Temp. Segunda</span></div><div class="clubStat"><b>${pts}</b><span>Puntos históricos</span></div><div class="clubStat"><b>${gf}</b><span>GF históricos</span></div>${st.streak?`<div class="clubStat"><b>${st.streak}</b><span>Años D2 sin top 4</span></div>`:''}`);const finance=world.financeHistory?.find(x=>x.season===world.history?.[world.history.length-1]?.season)?.awards?.[t.id],identity=$('#clubProfile .clubIdentity');if(finance&&identity)identity.insertAdjacentHTML('beforeend',`<div class="vm-budget-note">Último balance: ingresos ${(finance.prize+finance.bonus).toFixed(1)}M − plantilla ${finance.cost.toFixed(1)}M − tesorería ${(finance.treasuryCost||0).toFixed(1)}M = <b>${finance.delta>=0?'+':''}${finance.delta.toFixed(1)}M</b></div>`);if(st.active&&identity)identity.insertAdjacentHTML('beforeend',`<div class="stagnationWarning"><span class="stagnationBadge">⚠ Crisis institucional</span><br><b>${st.streak} temporadas seguidas en Segunda sin top 4.</b><br>Candidato a reestructuración: entrenador, identidad o reconstrucción de plantilla.</div>`)
+ vm11BaseRenderClubProfile(t);if(!t)return;const rows=clubSeasonRows(t),d1=rows.filter(x=>x.div==='Primera'),d2=rows.filter(x=>x.div==='Segunda'),pts=rows.reduce((a,x)=>a+x.pts,0),gf=rows.reduce((a,x)=>a+x.gf,0),box=$('#clubProfile .clubStatsGrid');if(box)box.insertAdjacentHTML('beforeend',`<div class="clubStat"><b>${d1.length}</b><span>Temp. Primera</span></div><div class="clubStat"><b>${d2.length}</b><span>Temp. Segunda</span></div><div class="clubStat"><b>${pts}</b><span>Puntos históricos</span></div><div class="clubStat"><b>${gf}</b><span>GF históricos</span></div>`);const finance=world.financeHistory?.find(x=>x.season===world.history?.[world.history.length-1]?.season)?.awards?.[t.id],identity=$('#clubProfile .clubIdentity');if(finance&&identity)identity.insertAdjacentHTML('beforeend',`<div class="vm-budget-note">Último balance anual: premio ${(finance.prize+finance.bonus).toFixed(1)}M − mantenimiento ${finance.cost.toFixed(1)}M = <b>${finance.delta>=0?'+':''}${finance.delta.toFixed(1)}M</b></div>`)
 }
 if($('#autoMarket')){const old=$('#autoMarket'),b=old.cloneNode(true);old.replaceWith(b);b.addEventListener('click',autoMarket)}
 if($('#closeMarket')){const old=$('#closeMarket'),b=old.cloneNode(true);old.replaceWith(b);b.addEventListener('click',startNextSeason)}
@@ -1674,10 +1145,10 @@ function vm11BalanceSelfTest(){
  const out=[],t=(name,fn)=>{try{fn();out.push({name,ok:true})}catch(e){out.push({name,ok:false,error:e.message})}};const save=world?structuredClone(world):null,tm=structuredClone(teams),nid=nextPlayerId,nt=nextTeamId,rs=rngState,testing=TESTING;TESTING=true;
  try{
   resetTestWorld('ratings',12,6);finishSeasonTest();
-  t('relegated can reshape up to five without bypassing roster floors',()=>{const id=world.history[0].relegatedIds[0],seller=team(id);assert(vm11OutgoingLimit(seller)===5,'limit');const sellable=seller.players.filter(p=>!saleBlockReason(seller,p));assert(sellable.length>=0,'guard')});
+  t('relegated max outgoing <=2',()=>{const id=world.history[0].relegatedIds[0],seller=team(id);assert(vm11OutgoingLimit(seller)<=2,'limit')});
   t('seller diversity no triple',()=>{world.offers=[];world.marketMemory={recentBuyers:[],offerCount:{},recentSellers:[],sellerOfferCount:{}};generateOffers(25);const a=world.offers.map(x=>x.sellerId).filter(x=>x!=null);for(let i=2;i<a.length;i++)assert(!(a[i]===a[i-1]&&a[i]===a[i-2]),'triple seller')});
   t('seller max 2 in rolling 5',()=>{const a=world.offers.map(x=>x.sellerId).filter(x=>x!=null);for(let i=0;i<a.length;i++){const w=a.slice(Math.max(0,i-4),i+1);assert(w.filter(x=>x===a[i]).length<=2,'seller repeat')}});
-  t('buyer can replace at positional max',()=>{const b=world.teams[0];while(vm11PosCount(b,'POR')<3)b.players.push(makePlayer(b.id,'POR',65,20));const p=world.teams[1].players.find(x=>x.pos==='POR');b.budget=999;assert(vm11BuyerCapacity(b,p),'replacement should be allowed')});
+  t('buyer positional max',()=>{const b=world.teams[0];while(vm11PosCount(b,'POR')<3)b.players.push(makePlayer(b.id,'POR',65,20));const p=world.teams[1].players.find(x=>x.pos==='POR');b.budget=999;assert(!vm11BuyerCapacity(b,p),'keeper cap')});
   t('roster trimming -> free agents',()=>{const a=world.teams[0],before=(world.freeAgents||[]).length;while(vm11PosCount(a,'POR')<5)a.players.push(makePlayer(a.id,'POR',60,28));vm11TrimRoster(a);assert(vm11PosCount(a,'POR')<=3,'cap');assert(world.freeAgents.length>before,'free agents')});
   t('finance top prize > bottom',()=>{const h=world.history[0],top=vm11PrizeFor({pos:1},'d1',h.d1.length),bottom=vm11PrizeFor({pos:h.d1.length},'d1',h.d1.length);assert(top>bottom,'prize')});
   t('compact drops playerStats',()=>{world.history[0].playerStats=[{x:1}];const c=vm11CompactWorld(world);assert(!('playerStats'in c.history[0]),'playerStats')});
@@ -1687,7 +1158,7 @@ function vm11BalanceSelfTest(){
 }
 window.LeagueForgeVM.balanceTest=vm11BalanceSelfTest;
 
-/* ---------- VM 1.3 DRAFT TESTS ---------- */
+/* ---------- VM 1.2 DRAFT TESTS ---------- */
 function vm12DraftSelfTest(){
  const out=[],t=(name,fn)=>{try{fn();out.push({name,ok:true})}catch(e){out.push({name,ok:false,error:e.message})}};const save=world?structuredClone(world):null,tm=structuredClone(teams),nid=nextPlayerId,nt=nextTeamId,rs=rngState,testing=TESTING;TESTING=true;
  try{
@@ -1702,22 +1173,6 @@ function vm12DraftSelfTest(){
  }finally{world=save;teams=tm;nextPlayerId=nid;nextTeamId=nt;rngState=rs;TESTING=testing;if(!TESTING)renderAll()}return out;
 }
 window.LeagueForgeVM.draftTest=vm12DraftSelfTest;
-
-
-/* ---------- VM 1.3 ECONOMY / STAGNATION / MARKET TESTS ---------- */
-function vm13BalanceSelfTest(){const snapshot={teams:structuredClone(teams),nextTeamId,nextPlayerId,world:world?structuredClone(world):null,rngState,leagueTab},results=[],t=(name,fn)=>{try{fn();results.push({name,ok:true})}catch(e){results.push({name,ok:false,error:e?.message||String(e)})}};TESTING=true;try{
- t('market allows five incoming and outgoing',()=>{resetTestWorld();finishSeasonTest();const a=world.teams[0];assert(vm11IncomingLimit(a)>=5,'incoming');assert(vm11OutgoingLimit(a)>=5,'outgoing')});
- t('stagnation warning after seven bad D2 seasons',()=>{resetTestWorld();const id=world.teams[0].id;world.history=[];for(let y=1;y<=7;y++){const d2=Array.from({length:8},(_,i)=>({id:10000+y*20+i,name:'x'+i,pts:10-i,w:0,d:0,l:0,gf:0,ga:0}));d2[5].id=id;world.history.push({season:y,d1:[],d2})}assert(vm13Stagnation(world.teams[0]).active,'not active')});
- t('top4 resets stagnation streak',()=>{resetTestWorld();const id=world.teams[0].id;world.history=[];for(let y=1;y<=6;y++){const d2=Array.from({length:8},(_,i)=>({id:11000+y*20+i,name:'x'+i,pts:10-i,w:0,d:0,l:0,gf:0,ga:0}));d2[5].id=id;world.history.push({season:y,d1:[],d2})}const d2=Array.from({length:8},(_,i)=>({id:12000+i,name:'x'+i,pts:10-i,w:0,d:0,l:0,gf:0,ga:0}));d2[2].id=id;world.history.push({season:7,d1:[],d2});assert(vm13Stagnation(world.teams[0]).streak===0,'not reset')});
- t('treasury cost rises with budget',()=>{resetTestWorld();const a=world.teams[0];a.budget=50;const lo=vm13TreasuryCost(a);a.budget=130;assert(vm13TreasuryCost(a)>lo,'cost')});
- t('season finance respects 135 cap',()=>{resetTestWorld();world.teams.forEach(x=>x.budget=134);finishSeasonTest();assert(Math.max(...world.teams.map(x=>x.budget))<=135,'cap')});
- t('automatic market has more movement',()=>{resetTestWorld('ratings',16,8);finishSeasonTest();world.teams.forEach(x=>x.budget=100);const before=world.transferRecords.length;autoMarket();assert(world.transferRecords.length-before>=24,'movement '+(world.transferRecords.length-before))});
- t('automatic market preserves roster rules',()=>{for(const a of world.teams){assert(a.players.length>=18&&a.players.length<=25,'size');for(const pos of POS)assert(vm11PosCount(a,pos)>=VM11_ROSTER[pos].min&&vm11PosCount(a,pos)<=VM11_ROSTER[pos].max,pos)}})
- }finally{TESTING=false;teams=snapshot.teams;nextTeamId=snapshot.nextTeamId;nextPlayerId=snapshot.nextPlayerId;world=snapshot.world;rngState=snapshot.rngState;leagueTab=snapshot.leagueTab;renderTeams();renderPlayerTeamSelect();renderAll()}return results}
-window.LeagueForgeVM.balance13Test=vm13BalanceSelfTest;
-window.LeagueForgeVM.marketProbe=function(){const save=world?structuredClone(world):null,tm=structuredClone(teams),nid=nextPlayerId,nt=nextTeamId,rs=rngState,testing=TESTING;TESTING=true;try{resetTestWorld('ratings',16,8);finishSeasonTest();world.teams.forEach(x=>x.budget=100);const before=world.transferRecords.length;autoMarket();return{moved:world.transferRecords.length-before,clubs:world.teams.map(t=>({name:t.name,in:vm11SeasonTransfers(t.id,'in'),out:vm11SeasonTransfers(t.id,'out'),budget:t.budget,size:t.players.length,pos:Object.fromEntries(POS.map(p=>[p,vm11PosCount(t,p)]))})),pending:world.offers.filter(o=>o.status==='pending').length,free:(world.freeAgents||[]).length};}finally{world=save;teams=tm;nextPlayerId=nid;nextTeamId=nt;rngState=rs;TESTING=testing;renderTeams();renderPlayerTeamSelect();renderAll()}};
-window.LeagueForgeVM.stress13=function(seasons=30,seed=17117){const save=world?structuredClone(world):null,tm=structuredClone(teams),nid=nextPlayerId,nt=nextTeamId,rs=rngState,testing=TESTING;TESTING=true;try{resetTestWorld('ratings',16,8);seedRng(seed);const budgets=[],moves=[],violations=[],champions=new Set();for(let y=0;y<seasons;y++){finishSeasonTest();champions.add(world.history[world.history.length-1].champion);const before=world.transferRecords.length;autoMarket();moves.push(world.transferRecords.length-before);const bs=world.teams.map(t=>t.budget).sort((a,b)=>a-b);budgets.push({season:y+1,min:bs[0],max:bs[bs.length-1],mean:bs.reduce((a,b)=>a+b,0)/bs.length,median:(bs[7]+bs[8])/2,atCap:bs.filter(x=>x>=134.9).length});for(const t of world.teams){if(t.players.length<18||t.players.length>25)violations.push({season:y+1,team:t.name,type:'size',n:t.players.length});for(const pos of POS){const c=vm11PosCount(t,pos);if(c<VM11_ROSTER[pos].min||c>VM11_ROSTER[pos].max)violations.push({season:y+1,team:t.name,type:pos,n:c})}}startNextSeason()}const st=world.teams.map(t=>({team:t.name,...vm13Stagnation(t)})).filter(x=>x.active);return{season:world.season.no,archived:world.history.length,distinctChampions:champions.size,moves:{avg:moves.reduce((a,b)=>a+b,0)/moves.length,min:Math.min(...moves),max:Math.max(...moves),all:moves},budgets:{first:budgets[0],last:budgets[budgets.length-1],avgMedian:budgets.reduce((a,b)=>a+b.median,0)/budgets.length,capObservations:budgets.reduce((a,b)=>a+b.atCap,0),series:budgets},violations,stagnant:st,freeAgents:(world.freeAgents||[]).length,rawBytes:new TextEncoder().encode(JSON.stringify(world)).length};}finally{world=save;teams=tm;nextPlayerId=nid;nextTeamId=nt;rngState=rs;TESTING=testing;renderTeams();renderPlayerTeamSelect();renderAll()}};
-
 
 /* ---------- TEST SUITE ---------- */
 function assert(cond,msg){if(!cond)throw new Error(msg)}
@@ -1787,7 +1242,7 @@ function runTests(){
   test('Récord de partido se actualiza',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);assert(world.records.biggestWin&&world.records.mostGoalsMatch,'records')});
   test('Rivalidades acumulan encuentros',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);assert(Object.keys(world.rivalries).length===1,'rivalry')});
   test('Hall of Fame tiene candidatos y club',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);const q=careerCandidates()[0];assert(q&&playerMainClubName(q),'hof')});
-  test('Payload es v5.3 compacto',()=>{resetTestWorld();const p=statePayload();assert(p.version==='5.3'&&p.client==='VM1.3'&&!p.teams,'payload')});
+  test('Payload es v5.1 compacto',()=>{resetTestWorld();const p=statePayload();assert(p.version==='5.2'&&p.client==='VM1.2'&&!p.teams,'payload')});
   test('Migración añade coach y marketConfig',()=>{resetTestWorld();delete world.teams[0].coach;delete world.marketConfig;normalizeWorldV5(world);assert(world.teams[0].coach&&world.marketConfig.mode,'migration')});
   test('UI selector plantillas contiene clubes',()=>{resetTestWorld();renderPlayerTeamSelect();assert($('#playerTeamSelect').options.length===world.teams.length,'selector')});
   test('UI cambia entre vistas',()=>{switchView('players');assert($('#players').classList.contains('active'),'view');switchView('dashboard')});
@@ -1799,13 +1254,15 @@ function runTests(){
   TESTING=false;teams=snapshot.teams;nextTeamId=snapshot.nextTeamId;nextPlayerId=snapshot.nextPlayerId;world=snapshot.world;rngState=snapshot.rngState;leagueTab=snapshot.leagueTab;
   $('#mode').value=snapshot.form.mode;$('#topSize').value=snapshot.form.topSize;$('#movement').value=snapshot.form.movement;$('#legs').value=snapshot.form.legs;$('#seedInput').value=snapshot.form.seed;renderTeams();renderPlayerTeamSelect();renderAll();switchView('dashboard');
  }
- const passed=results.filter(x=>x.ok).length,banner=$('#testBanner');banner.style.display='block';banner.id='TEST_RESULT';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '));document.title=`LeagueForge VM 1.3 Tests ${passed}/${results.length}`;return results;
+ const passed=results.filter(x=>x.ok).length,banner=$('#testBanner');banner.style.display='block';banner.id='TEST_RESULT';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '));document.title=`LeagueForge v5 Tests ${passed}/${results.length}`;return results;
 }
 window.LeagueForge={runTests,createWorld,simLeagueRound,simLeagueAll,simLeagueMatch,simCupRound,simCupMatch,startNextSeason,generateOffers,autoMarket,setLeagueTab(v){leagueTab=v},get world(){return world}};
-$('#runTestsBtn').addEventListener('click',()=>{const core=runTests(),extra=vm11BalanceSelfTest(),draft=vm12DraftSelfTest(),v13=vm13BalanceSelfTest(),results=[...core,...extra,...draft,...v13],passed=results.filter(x=>x.ok).length;note(`Tests VM 1.3: ${passed}/${results.length} PASS`);const banner=$('#testBanner');banner.style.display='block';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '))});
+$('#runTestsBtn').addEventListener('click',()=>{
+  const core=runTests(),extra=vm11BalanceSelfTest(),draft=vm12DraftSelfTest(),results=[...core,...extra,...draft];
+  const passed=results.filter(x=>x.ok).length;
+  note(`Tests VM 1.2: ${passed}/${results.length} PASS`);
+  const banner=$('#testBanner');banner.style.display='block';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '));
+});
 renderTeams();renderPlayerTeamSelect();renderSetup();renderAll();setAutosaveStatus(localStorage.getItem(AUTO_SAVE_KEY)||localStorage.getItem(LEGACY_SAVE_KEY)||localStorage.getItem(LEGACY_SAVE_KEY2)||localStorage.getItem(LEGACY_SAVE_KEY3)?'disponible':'—');
 if(new URLSearchParams(location.search).get('test')==='1')setTimeout(runTests,50);
 })();
-</script>
-</body>
-</html>
