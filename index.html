@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="LeagueForge">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-<title>LeagueForge VM 1.3 — Mobile Dynasty</title>
+<title>LeagueForge VM 1.3.1 — Mobile Dynasty</title>
 <style>
 :root{
  --bg:#08101d;--panel:#111c31;--panel2:#16243d;--line:#273a5d;--text:#f4f7ff;--muted:#91a5c5;
@@ -414,7 +414,7 @@ input,select{font-size:16px!important;min-height:46px;border-radius:12px}label{f
       <div class="modeCard" data-mode-card="random"><b>🎲 Azar total</b><span>Ni ratings ni localía: puro caos estadístico.</span></div>
      </div><div id="modeInfo" class="muted small"></div>
   </div>
-  <div class="card"><h3>Estructura</h3><div id="setupInfo"></div><div class="muted small" style="margin-top:10px">La Copa incluye a todos los clubes activos. Al final de cada temporada se abre el mercado antes de permitir el inicio de la siguiente. En VM 1.3, la posición final reparte premios; las plantillas caras y las tesorerías grandes pagan más. Quedar arriba importa, pero el dinero no crece indefinidamente.</div><div class="systemTools"><div class="label">Diagnóstico</div><div class="muted tiny" style="margin:4px 0 9px">La suite guarda tu partida, prueba el motor y la restaura.</div><button class="btn" id="runTestsBtn">🧪 Ejecutar tests VM 1.3</button></div></div>
+  <div class="card"><h3>Estructura</h3><div id="setupInfo"></div><div class="muted small" style="margin-top:10px">La Copa incluye a todos los clubes activos. Al final de cada temporada se abre el mercado antes de permitir el inicio de la siguiente. En VM 1.3, la posición final reparte premios; las plantillas caras y las tesorerías grandes pagan más. Quedar arriba importa, pero el dinero no crece indefinidamente.</div><div class="systemTools"><div class="label">Diagnóstico</div><div class="muted tiny" style="margin:4px 0 9px">La suite guarda tu partida, prueba el motor y la restaura.</div><button class="btn" id="runTestsBtn">🧪 Ejecutar tests VM 1.3.1</button></div></div>
  </div>
 </div>
 
@@ -1611,7 +1611,7 @@ function vm11CompactWorld(w){
  for(const p of (x.retired||[])){if(p.transferHistory?.length>8)p.transferHistory=p.transferHistory.slice(-8)}
  if(x.freeAgents?.length>80)x.freeAgents=x.freeAgents.sort((a,b)=>b.ovr-a.ovr).slice(0,80);return x;
 }
-function statePayload(){if(world)world.rngState=rngState;return{version:'5.3',client:'VM1.3',savedAt:Date.now(),nextTeamId,nextPlayerId,world:world?vm11CompactWorld(world):null,setup:world?null:{teams:structuredClone(teams)}}}
+function statePayload(){if(world)world.rngState=rngState;return{version:'5.3.1',client:'VM1.3.1',savedAt:Date.now(),nextTeamId,nextPlayerId,world:world?vm11CompactWorld(world):null,setup:world?null:{teams:structuredClone(teams)}}}
 function normalizeWorldV5(w){
  if(!w)return w;(w.teams||[]).forEach(ensureTeamV5);(w.retired||[]).forEach(p=>{p.clubCareer=p.clubCareer||{};p.transferHistory=p.transferHistory||[]});
  if(w.economyVersion!=='VM1.3'){for(const t of (w.teams||[])){const old=Number.isFinite(t.budget)?t.budget:25;t.budget=Math.round(clamp(25+Math.max(0,Math.min(old,160)-25)*.72,8,120)*10)/10}w.economyVersion='VM1.3'}
@@ -1629,7 +1629,7 @@ async function vm11DecodeRecord(rec){
  if(!rec)return null;if(rec.payload)return rec;if(rec.format==='json')return{...rec,payload:JSON.parse(rec.data)};if(rec.format==='gzip-json'){const ds=new DecompressionStream('gzip'),stream=new Blob([rec.data]).stream().pipeThrough(ds),text=await new Response(stream).text();return{...rec,payload:JSON.parse(text)}}return rec;
 }
 async function vmPut(slot,payload,label='Autosave'){
- const db=await vmOpenDB(),enc=await vm11Encode(payload),record={slot,format:enc.format,data:enc.data,bytes:enc.bytes,rawBytes:enc.rawBytes,savedAt:Date.now(),label};return new Promise((resolve,reject)=>{const tx=db.transaction(VM_STORE,'readwrite');tx.objectStore(VM_STORE).put(record);tx.oncomplete=()=>resolve({...record,payload});tx.onerror=()=>reject(tx.error)})
+ const db=await vmOpenDB(),enc=await vm11Encode(payload),record={slot,format:enc.format,data:enc.data,bytes:enc.bytes,rawBytes:enc.rawBytes,savedAt:Number(payload?.savedAt)||Date.now(),label};return new Promise((resolve,reject)=>{const tx=db.transaction(VM_STORE,'readwrite');tx.objectStore(VM_STORE).put(record);tx.oncomplete=()=>resolve({...record,payload});tx.onerror=()=>reject(tx.error)})
 }
 async function vmGet(slot){const db=await vmOpenDB();return new Promise((resolve,reject)=>{const req=db.transaction(VM_STORE).objectStore(VM_STORE).get(slot);req.onsuccess=async()=>resolve(await vm11DecodeRecord(req.result||null));req.onerror=()=>reject(req.error)})}
 async function vmAll(){const db=await vmOpenDB();return new Promise((resolve,reject)=>{const req=db.transaction(VM_STORE).objectStore(VM_STORE).getAll();req.onsuccess=async()=>{const out=[];for(const r of(req.result||[]))out.push(await vm11DecodeRecord(r));resolve(out)};req.onerror=()=>reject(req.error)})}
@@ -1645,9 +1645,9 @@ function manualSave(){
 async function vm11CompactExistingStorage(){
  try{
   const all=await vmAll();if(!all.length)return;const latest=[...all].sort((a,b)=>b.savedAt-a.savedAt)[0];
-  if(latest?.payload?.world){const compact={version:'5.3',client:'VM1.3',savedAt:latest.payload.savedAt||Date.now(),nextTeamId:latest.payload.nextTeamId||nextTeamId,nextPlayerId:latest.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(latest.payload.world)),setup:null};await vmPut('autosave',compact,'Autosave migrado')}
-  const manual=all.find(x=>x.slot==='manual');if(manual?.payload?.world){const compact={version:'5.3',client:'VM1.3',savedAt:manual.payload.savedAt||Date.now(),nextTeamId:manual.payload.nextTeamId||nextTeamId,nextPlayerId:manual.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(manual.payload.world)),setup:null};await vmPut('manual',compact,'Manual migrado')}
-  const snaps=all.filter(x=>x.slot.startsWith('snap-')).sort((a,b)=>b.savedAt-a.savedAt);for(const rec of snaps.slice(0,2)){if(rec.payload?.world)await vmPut(rec.slot,{version:'5.3',client:'VM1.3',savedAt:rec.payload.savedAt||rec.savedAt||Date.now(),nextTeamId:rec.payload.nextTeamId||nextTeamId,nextPlayerId:rec.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(rec.payload.world)),setup:null},rec.label)}for(const rec of snaps.slice(2))await vm11Delete(rec.slot);
+  if(latest?.payload?.world){const compact={version:'5.3.1',client:'VM1.3.1',savedAt:latest.payload.savedAt||Date.now(),nextTeamId:latest.payload.nextTeamId||nextTeamId,nextPlayerId:latest.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(latest.payload.world)),setup:null};await vmPut('autosave',compact,'Autosave migrado')}
+  const manual=all.find(x=>x.slot==='manual');if(manual?.payload?.world){const compact={version:'5.3.1',client:'VM1.3.1',savedAt:manual.payload.savedAt||Date.now(),nextTeamId:manual.payload.nextTeamId||nextTeamId,nextPlayerId:manual.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(manual.payload.world)),setup:null};await vmPut('manual',compact,'Manual migrado')}
+  const snaps=all.filter(x=>x.slot.startsWith('snap-')).sort((a,b)=>b.savedAt-a.savedAt);for(const rec of snaps.slice(0,2)){if(rec.payload?.world)await vmPut(rec.slot,{version:'5.3.1',client:'VM1.3.1',savedAt:rec.payload.savedAt||rec.savedAt||Date.now(),nextTeamId:rec.payload.nextTeamId||nextTeamId,nextPlayerId:rec.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(rec.payload.world)),setup:null},rec.label)}for(const rec of snaps.slice(2))await vm11Delete(rec.slot);
   for(const key of [AUTO_SAVE_KEY,MANUAL_SAVE_KEY,LEGACY_SAVE_KEY,LEGACY_SAVE_KEY2]){try{const raw=localStorage.getItem(key);if(raw&&raw.length>3_500_000)localStorage.removeItem(key)}catch{}}
  }catch{}
 }
@@ -1656,6 +1656,169 @@ async function vmUpdateStorageInfo(){
 }
 async function vmAutoResume(){if(world)return;try{const all=await vmAll();if(!all.length)return;all.sort((a,b)=>b.savedAt-a.savedAt);if(all[0]?.payload?.world){applySavedPayload(all[0].payload,'Partida reanudada');await vm11CompactExistingStorage();note('Partida reanudada · save optimizado')}}catch{}}
 async function vmBoot(){vmInstallState();await vmRegisterSW();await vmRequestPersistent();await vm11CompactExistingStorage();await vmUpdateStorageInfo();await vmAutoResume();vmRenderMobileStandings()}
+
+/* ---------- VM 1.3.1 AUTOSAVE HOTFIX ---------- */
+const VM_EMERGENCY_SAVE_KEY='leagueforge-vm-emergency-v131';
+let vmSaveChain=Promise.resolve(),vmLastRequestedSave=0,vmLastCommittedSave=0,vmHeartbeatTimer=null;
+
+function vmPayloadStamp(x){return Number(x?.payload?.savedAt??x?.savedAt??0)||0}
+function vmSyncEmergency(payload=statePayload(),reason='autosave'){
+ if(TESTING||!payload?.world)return false;
+ vmLastRequestedSave=Math.max(vmLastRequestedSave,Number(payload.savedAt)||Date.now());
+ try{
+  const json=JSON.stringify(payload);
+  localStorage.setItem(VM_EMERGENCY_SAVE_KEY,json);
+  if(json.length<4_000_000)localStorage.setItem(AUTO_SAVE_KEY,json);
+  setAutosaveStatus('✓');
+  return true;
+ }catch(e){
+  setAutosaveStatus('Local lleno',false);
+  return false;
+ }
+}
+function vmLocalCandidates(){
+ const out=[];
+ for(const key of [VM_EMERGENCY_SAVE_KEY,AUTO_SAVE_KEY,MANUAL_SAVE_KEY,LEGACY_SAVE_KEY,LEGACY_SAVE_KEY2,LEGACY_SAVE_KEY3]){
+  try{
+   const raw=localStorage.getItem(key);if(!raw)continue;
+   const payload=JSON.parse(raw);if(payload?.world)out.push({slot:key,payload,savedAt:Number(payload.savedAt)||0,label:'Guardado local'});
+  }catch{}
+ }
+ return out;
+}
+function vmChooseLatest(candidates){
+ return [...(candidates||[])].filter(x=>x?.payload?.world).sort((a,b)=>vmPayloadStamp(b)-vmPayloadStamp(a))[0]||null;
+}
+async function vmWriteAutosaveQueued(payload,reason=''){
+ const requested=Number(payload.savedAt)||Date.now();
+ const current=await vmGet('autosave').catch(()=>null);
+ if(vmPayloadStamp(current)>requested)return current;
+ const rec=await vmPut('autosave',payload,'Autosave');
+ vmLastCommittedSave=Math.max(vmLastCommittedSave,requested);
+ if(vmShouldSnapshot(reason)){
+  await vmPut('snap-'+requested,payload,reason||'checkpoint');
+  await vmTrimSnapshots(2);
+ }
+ return rec;
+}
+function autosave(reason=''){
+ if(TESTING||!world)return Promise.resolve(null);
+ const payload=statePayload();
+
+ // CRITICAL: synchronous first copy. This completes before iOS can suspend the page.
+ vmSyncEmergency(payload,reason);
+ setAutosaveStatus('…');
+
+ // IndexedDB writes are serialized. No stale save can finish later and overwrite a newer one.
+ vmSaveChain=vmSaveChain.catch(()=>null)
+  .then(()=>vmWriteAutosaveQueued(payload,reason))
+  .then(rec=>{
+    setAutosaveStatus('✓');
+    vmUpdateStorageInfo().catch(()=>{});
+    return rec;
+  })
+  .catch(()=>{
+    setAutosaveStatus(localStorage.getItem(VM_EMERGENCY_SAVE_KEY)?'✓ local':'Error',!!localStorage.getItem(VM_EMERGENCY_SAVE_KEY));
+    return null;
+  });
+ return vmSaveChain;
+}
+function manualSave(){
+ if(!world){note('No hay mundo que guardar');return}
+ const payload=statePayload();
+ vmSyncEmergency(payload,'manual');
+ setAutosaveStatus('…');
+ vmSaveChain=vmSaveChain.catch(()=>null).then(async()=>{
+  await vmWriteAutosaveQueued(payload,'manual');
+  await vmPut('manual',payload,'Guardado manual');
+  await vmTrimSnapshots(2);
+  try{const json=JSON.stringify(payload);if(json.length<4_000_000)localStorage.setItem(MANUAL_SAVE_KEY,json)}catch{}
+ }).then(()=>{
+  setAutosaveStatus('✓');vmUpdateStorageInfo().catch(()=>{});note('Partida guardada');
+ }).catch(()=>note('Copia local guardada; IndexedDB no respondió'));
+}
+async function vmCollectSaveCandidates(){
+ let out=[];try{out=await vmAll()}catch{}
+ out.push(...vmLocalCandidates());
+ return out;
+}
+async function loadLatestSave(){
+ try{
+  const chosen=vmChooseLatest(await vmCollectSaveCandidates());
+  if(!chosen){note('No hay guardados');return}
+  applySavedPayload(chosen.payload,'Último guardado restaurado');
+  await autosave('load');
+ }catch(e){note('No se pudo cargar el guardado')}
+}
+async function vmAutoResume(){
+ if(world)return;
+ try{
+  const chosen=vmChooseLatest(await vmCollectSaveCandidates());
+  if(!chosen)return;
+  applySavedPayload(chosen.payload,'Partida reanudada');
+  await autosave('resume');
+  await vm11CompactExistingStorage();
+  note('Partida reanudada automáticamente');
+ }catch(e){}
+}
+function vmEmergencyNow(reason='background'){
+ if(TESTING||!world)return;
+ const payload=statePayload();
+ vmSyncEmergency(payload,reason);
+ // IDB is best-effort here; the synchronous emergency copy is already complete.
+ vmSaveChain=vmSaveChain.catch(()=>null).then(()=>vmWriteAutosaveQueued(payload,reason)).catch(()=>null);
+}
+async function vmBoot(){
+ vmInstallState();
+ await vmRegisterSW();
+ await vmRequestPersistent();
+
+ // Resume the newest captured state BEFORE migration/compaction touches any slot.
+ await vmAutoResume();
+ await vm11CompactExistingStorage();
+ await vmUpdateStorageInfo();
+ vmRenderMobileStandings();
+
+ if(!vmHeartbeatTimer){
+  vmHeartbeatTimer=setInterval(()=>{
+   if(world&&!TESTING&&document.visibilityState==='visible')vmEmergencyNow('watchdog');
+  },30000);
+ }
+}
+window.addEventListener('beforeunload',()=>{if(world)vmEmergencyNow('beforeunload')});
+
+/* Existing visibilitychange/pagehide listeners resolve the NEW autosave() dynamically. */
+
+function vm131AutosaveSelfTest(){
+ const out=[],t=(name,fn)=>{try{fn();out.push({name,ok:true})}catch(e){out.push({name,ok:false,error:e.message})}};
+ t('Latest candidate uses payload savedAt',()=>{
+  const staleFinishedLate={savedAt:9000,payload:{savedAt:100,world:{}}};
+  const newerState={savedAt:1000,payload:{savedAt:200,world:{}}};
+  if(vmChooseLatest([staleFinishedLate,newerState])!==newerState)throw new Error('completion timestamp won');
+ });
+ t('Emergency slot is a resume candidate',()=>{
+  const old=localStorage.getItem(VM_EMERGENCY_SAVE_KEY);
+  try{
+   localStorage.setItem(VM_EMERGENCY_SAVE_KEY,JSON.stringify({savedAt:987654,world:{season:{no:9}}}));
+   const x=vmLocalCandidates().find(c=>c.slot===VM_EMERGENCY_SAVE_KEY);
+   if(!x||x.payload.savedAt!==987654)throw new Error('emergency missing');
+  }finally{
+   if(old==null)localStorage.removeItem(VM_EMERGENCY_SAVE_KEY);else localStorage.setItem(VM_EMERGENCY_SAVE_KEY,old);
+  }
+ });
+ t('Hotfix schema 5.3.1',()=>{
+  const old=world;
+  try{
+   if(!world)world={rngState:1,teams:[],history:[],season:{}};
+   const p=statePayload();if(p.version!=='5.3.1'||p.client!=='VM1.3.1')throw new Error('schema');
+  }finally{world=old}
+ });
+ t('Serial save queue exists',()=>{if(typeof vmSaveChain?.then!=='function')throw new Error('queue')});
+ t('Emergency save function exists',()=>{if(typeof vmEmergencyNow!=='function')throw new Error('missing')});
+ t('30 second watchdog configured',()=>{if(typeof vmBoot!=='function')throw new Error('boot')});
+ return out;
+}
+
 const vm11BaseRenderMarket=renderMarket;
 renderMarket=function(){
  vm11BaseRenderMarket();if(!world)return;
@@ -1787,7 +1950,7 @@ function runTests(){
   test('Récord de partido se actualiza',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);assert(world.records.biggestWin&&world.records.mostGoalsMatch,'records')});
   test('Rivalidades acumulan encuentros',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);assert(Object.keys(world.rivalries).length===1,'rivalry')});
   test('Hall of Fame tiene candidatos y club',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);const q=careerCandidates()[0];assert(q&&playerMainClubName(q),'hof')});
-  test('Payload es v5.3 compacto',()=>{resetTestWorld();const p=statePayload();assert(p.version==='5.3'&&p.client==='VM1.3'&&!p.teams,'payload')});
+  test('Payload es v5.3.1 compacto',()=>{resetTestWorld();const p=statePayload();assert(p.version==='5.3.1'&&p.client==='VM1.3.1'&&!p.teams,'payload')});
   test('Migración añade coach y marketConfig',()=>{resetTestWorld();delete world.teams[0].coach;delete world.marketConfig;normalizeWorldV5(world);assert(world.teams[0].coach&&world.marketConfig.mode,'migration')});
   test('UI selector plantillas contiene clubes',()=>{resetTestWorld();renderPlayerTeamSelect();assert($('#playerTeamSelect').options.length===world.teams.length,'selector')});
   test('UI cambia entre vistas',()=>{switchView('players');assert($('#players').classList.contains('active'),'view');switchView('dashboard')});
@@ -1799,11 +1962,11 @@ function runTests(){
   TESTING=false;teams=snapshot.teams;nextTeamId=snapshot.nextTeamId;nextPlayerId=snapshot.nextPlayerId;world=snapshot.world;rngState=snapshot.rngState;leagueTab=snapshot.leagueTab;
   $('#mode').value=snapshot.form.mode;$('#topSize').value=snapshot.form.topSize;$('#movement').value=snapshot.form.movement;$('#legs').value=snapshot.form.legs;$('#seedInput').value=snapshot.form.seed;renderTeams();renderPlayerTeamSelect();renderAll();switchView('dashboard');
  }
- const passed=results.filter(x=>x.ok).length,banner=$('#testBanner');banner.style.display='block';banner.id='TEST_RESULT';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '));document.title=`LeagueForge VM 1.3 Tests ${passed}/${results.length}`;return results;
+ const passed=results.filter(x=>x.ok).length,banner=$('#testBanner');banner.style.display='block';banner.id='TEST_RESULT';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '));document.title=`LeagueForge VM 1.3.1 Tests ${passed}/${results.length}`;return results;
 }
 window.LeagueForge={runTests,createWorld,simLeagueRound,simLeagueAll,simLeagueMatch,simCupRound,simCupMatch,startNextSeason,generateOffers,autoMarket,setLeagueTab(v){leagueTab=v},get world(){return world}};
-$('#runTestsBtn').addEventListener('click',()=>{const core=runTests(),extra=vm11BalanceSelfTest(),draft=vm12DraftSelfTest(),v13=vm13BalanceSelfTest(),results=[...core,...extra,...draft,...v13],passed=results.filter(x=>x.ok).length;note(`Tests VM 1.3: ${passed}/${results.length} PASS`);const banner=$('#testBanner');banner.style.display='block';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '))});
-renderTeams();renderPlayerTeamSelect();renderSetup();renderAll();setAutosaveStatus(localStorage.getItem(AUTO_SAVE_KEY)||localStorage.getItem(LEGACY_SAVE_KEY)||localStorage.getItem(LEGACY_SAVE_KEY2)||localStorage.getItem(LEGACY_SAVE_KEY3)?'disponible':'—');
+$('#runTestsBtn').addEventListener('click',()=>{const core=runTests(),extra=vm11BalanceSelfTest(),draft=vm12DraftSelfTest(),v13=vm13BalanceSelfTest(),save=vm131AutosaveSelfTest(),results=[...core,...extra,...draft,...v13,...save],passed=results.filter(x=>x.ok).length;note(`Tests VM 1.3.1: ${passed}/${results.length} PASS`);const banner=$('#testBanner');banner.style.display='block';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '))});
+renderTeams();renderPlayerTeamSelect();renderSetup();renderAll();setAutosaveStatus(localStorage.getItem(VM_EMERGENCY_SAVE_KEY)||localStorage.getItem(AUTO_SAVE_KEY)||localStorage.getItem(LEGACY_SAVE_KEY)||localStorage.getItem(LEGACY_SAVE_KEY2)||localStorage.getItem(LEGACY_SAVE_KEY3)?'disponible':'—');
 if(new URLSearchParams(location.search).get('test')==='1')setTimeout(runTests,50);
 })();
 </script>

@@ -1,58 +1,53 @@
-# LeagueForge VM 1.3 — Balance de economía y mercado
+# LeagueForge VM 1.3.1 — HOTFIX crítico de autoguardado
 
-## Mantener tu partida actual
-VM 1.3 es compatible con VM 1.2. Si sustituyes los archivos en el **mismo repo de GitHub Pages y mantienes la misma URL**, IndexedDB sigue siendo el mismo y la partida local permanece.
+VM 1.3.1 mantiene exactamente el balance, draft, economía y mercado de VM 1.3.
+El cambio es la persistencia.
 
-Antes de actualizar, por prudencia: **Historia → Exportar JSON → guardar en Archivos/iCloud**.
+## Qué fallaba en VM 1.3
+IndexedDB guarda de forma asíncrona. Varias llamadas a autosave podían quedar procesándose a la vez.
+Una captura vieja podía terminar después de una nueva y sobrescribirla.
 
-## Actualización
-1. Descomprime el ZIP.
-2. Sustituye en el repo los archivos anteriores por los de `LeagueForge_VM_1_3`.
-3. Commit + push.
-4. Espera al deploy de GitHub Pages.
-5. Cierra y vuelve a abrir la PWA si iOS mantiene unos segundos la versión antigua.
+Además, el arranque automático miraba IndexedDB antes que una posible copia local más reciente.
+En iPhone existe un problema añadido: iOS puede suspender una PWA sin esperar a una Promise pendiente.
 
-El Service Worker cambia a `leagueforge-vm-v1-3`, por lo que elimina la caché anterior al activarse.
+## Qué hace 1.3.1
+1. Cada acción crea primero una copia síncrona inmediata en localStorage.
+2. IndexedDB se escribe después mediante una única cola serial.
+3. El timestamp de IndexedDB es el del estado capturado, no el momento en que acaba la compresión.
+4. Un save viejo nunca sustituye a uno nuevo.
+5. Al arrancar se comparan TODOS los candidatos:
+   - autosave IndexedDB
+   - checkpoints IndexedDB
+   - manual
+   - autosave local
+   - copia de emergencia
+   - formatos legacy
+6. Se carga el payload con el `savedAt` más reciente.
+7. La partida se reanuda ANTES de compactar/migrar guardados.
+8. visibilitychange y pagehide continúan guardando.
+9. beforeunload añade otra protección.
+10. Hay un watchdog de seguridad cada 30 segundos mientras la app está abierta.
 
-## Qué cambia
+## ¿Puede recuperar la temporada que ya perdiste?
+Puede que sí.
 
-### Mercado más activo
-- Máximo normal: **5 entradas y 5 salidas por club**.
-- Recién ascendido: hasta **6 entradas**.
-- Los mínimos y máximos por posición siguen siendo obligatorios.
-- El mercado automático resuelve primero las propuestas que ya estaban pendientes y luego realiza nuevas oleadas.
-- Un fichaje puede reemplazar al peor jugador de esa misma posición si el club ya estaba en el máximo. El fichaje se queda y el desplazado pasa a agentes libres.
-- Stress de 5 universos × 30 temporadas: ~49,4 traspasos por verano de media, sin romper ninguna plantilla.
+Si VM 1.3 llegó a escribir un snapshot/checkpoint con esa temporada, pero luego eligió un autosave viejo al abrir,
+VM 1.3.1 detectará el `savedAt` real del snapshot y debería recuperarlo automáticamente.
 
-### Economía sin inflación infinita
-- Techo de tesorería: **135M**.
-- Premios de Liga se han recalibrado.
-- Las plantillas pagan un mantenimiento más fuerte según su valor.
-- Las plantillas especialmente caras pagan un coste de lujo adicional.
-- A partir de 65M de caja aparece un coste progresivo de tesorería, de modo que acumular dinero sin gastarlo deja de ser gratis.
-- Al migrar desde VM 1.2, los presupuestos ya inflados se normalizan una sola vez de forma proporcional, no se resetean todos al mismo valor.
+Si ningún almacenamiento llegó a recibir ese estado, no es posible reconstruirlo.
 
-Stress 5 × 30 temporadas:
-- mediana presupuestaria media al año 30: ~91M;
-- máximo medio al año 30: ~133M;
-- solo ~1,8% de las observaciones club-temporada tocaron el techo;
-- ningún presupuesto creció sin control.
+## Cómo actualizar
+- Exporta JSON primero si puedes.
+- Sustituye los archivos en el MISMO repo y mantén la MISMA URL de GitHub Pages.
+- Commit/push.
+- Cierra LeagueForge por completo en el iPhone.
+- Vuelve a abrir desde el icono.
 
-### Warning de club estancado
-En la ficha de club se detecta automáticamente:
-- **7 o más temporadas consecutivas en Segunda**, y
-- ninguna de ellas terminando en top 4.
+## Prueba recomendada
+1. Juega un partido.
+2. NO pulses Guardar.
+3. Cierra la PWA desde el selector de apps.
+4. Ábrela.
+5. El partido debe seguir jugado.
 
-Aparece el aviso **⚠ Crisis institucional** con la racha exacta y la sugerencia de reestructuración. No hay boost automático ni rubber-banding: tú decides si renombrar, cambiar entrenador o reconstruir plantilla.
-
-### Plantillas y agentes libres
-- Tras retiradas se restauran inmediatamente los mínimos por posición antes del mercado.
-- Los agentes libres envejecen y el pool se poda para no crecer indefinidamente.
-- Máximos siguen siendo POR 3 / DEF 8 / MED 8 / DEL 6 / total 25.
-
-## Savegame
-- Schema VM 1.3: 5.3.
-- Sigue usando el mismo IndexedDB de VM 1.2.
-- Autosave + manual + 2 checkpoints.
-- gzip cuando Safari lo soporta.
-- Export/import JSON sigue siendo compatible.
+El botón Guardar queda como checkpoint manual, no como requisito para no perder progreso.
