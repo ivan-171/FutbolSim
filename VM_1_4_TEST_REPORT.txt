@@ -1,0 +1,61 @@
+LeagueForge VM 1.4 — Validation Report
+========================================
+
+BUILD
+- Save schema: 5.4
+- Client: VM1.4
+- Backward compatible with VM 1.3.1 / schema 5.3.1
+- Service Worker cache: leagueforge-vm-v1-4
+
+REGRESSION TESTS
+- Core engine: 60/60 PASS
+- VM 1.1 market/economy: 9/9 PASS
+- VM 1.2 draft: 8/8 PASS
+- VM 1.3 economy/stagnation: 7/7 PASS
+- VM 1.4 dynamic ratings / potential / smart market: 9/9 PASS
+- Gameplay + balance total: 93/93 PASS
+
+AUTOSAVE
+- VM 1.3.1 sync-first local emergency copy + serialized IndexedDB logic preserved.
+- 5/6 browser diagnostics execute in the opaque set_content sandbox.
+- The unavailable diagnostic is the one that directly reads localStorage; that sandbox denies localStorage access by origin policy.
+
+VM 1.4 NEW TEST COVERAGE
+1. Dynamic rating ignores legacy fixed club OVR.
+2. Every active player has potential.
+3. Development projection stays in -3..+3.
+4. One player cannot move twice in a window.
+5. No hard five-transfer cap exists.
+6. Core player cannot directly move to a worse sporting destination.
+7. Auto market creates no duplicate player movement in a window.
+8. Auto market sells at most one original core player per club.
+9. Squads remain legal after smart market.
+
+30-SEASON STRESS — THREE SEEDS
+Seed 17117: avg 70.7 player moves, range 64–77, max club movement legs 12, final budget median 112.25M, final mean XI 83.05, roster violations 0.
+Seed 24680: avg 69.9 player moves, range 65–75, max club movement legs 12, final budget median 98.65M, final mean XI 83.64, roster violations 0.
+Seed 53101: avg 70.5 player moves, range 63–79, max club movement legs 11, final budget median 104.40M, final mean XI 83.31, roster violations 0.
+
+Aggregate: ~70.4 moves/summer, average final budget median ~105.1M, average final XI ~83.3, total roster violations 0.
+
+MARKET QUALITY PROBE — 480 CLUB-SUMMERS
+- Average XI change from market: +0.04
+- XI decline >1 point: 59/480
+- XI decline >2 points: 9/480
+- Worst observed decline: -2.91
+- Best observed improvement: +3.82
+
+REAL USER T23 SAVE PROBE
+Juglares Unidos: static saved OVR 66; dynamic XI 82.64; synced displayed OVR 83; plan Ascenso; smart-market probe final XI 82.82.
+Jinetes de Rohan: dynamic XI 76.91; smart-market probe final XI 78.09.
+Duplicate player IDs moved in the same probe window: 0.
+
+MOBILE
+- 320 px: PASS, no horizontal overflow
+- 390 px: PASS, no horizontal overflow
+- 430 px: PASS, no horizontal overflow
+
+STATIC VALIDATION
+- Main JS syntax: PASS
+- Service Worker syntax: PASS
+- Manifest JSON: PASS
