@@ -1,96 +1,49 @@
-# LeagueForge VM 1.4 — Dynamic Clubs & Smart Market
+# LeagueForge VM 1.4.1 — continuidad del campeón y retorno inmediato
 
-VM 1.4 is compatible with your VM 1.3.1 save.
+Esta versión es una **actualización conservadora de la VM 1.4**. No cambia la resolución de partidos, los drafts, el potencial, la cantidad de operaciones del mercado ni los parámetros económicos.
 
-## Updating without losing the save
-Keep the SAME GitHub Pages repository and the SAME public URL/origin.
+## Actualizar GitHub Pages sin perder la partida
 
-1. Export JSON from the current version as a backup.
-2. Replace the repo-root files with the contents of `LeagueForge_VM_1_4`.
-3. Commit/push and let GitHub Pages deploy.
-4. Fully close the PWA on the iPhone.
-5. Reopen LeagueForge from the Home Screen icon.
+1. **Antes de subir nada**, en la PWA actual pulsa **Exportar JSON** y guarda la copia en Archivos/iCloud.
+2. Descarga y descomprime el ZIP de VM 1.4.1.
+3. Sube **el contenido de `LeagueForge_VM_1_4_1/`**, no la carpeta exterior, a la **raíz del mismo repositorio de GitHub Pages**.
+4. Haz commit/push y comprueba que GitHub Pages desplegó la actualización.
+5. Cierra completamente LeagueForge en el iPhone y ábrelo de nuevo desde el icono. Si tarda en actualizarse, ciérralo y ábrelo otra vez.
+6. **No borres la PWA ni limpies los datos web**: tu guardado existente está asociado al mismo origen/URL.
 
-The VM 1.3.1 autosave hotfix is preserved. IndexedDB and the emergency local save remain compatible.
+Saves VM 1.4 / schema 5.4 siguen siendo compatibles: el nuevo formato escribe schema **5.4.1**, mantiene IndexedDB y las copias de emergencia de VM 1.3.1.
 
-## Save migration
-- Loads VM 1.3.1 / schema 5.3.1 automatically.
-- Saves as schema 5.4 / VM1.4.
-- Existing players receive deterministic potential based on current age/OVR.
-- Historical seasons are not retroactively rewritten.
-- Old club OVR/ATA/DEF is retained only as `initialRatings`; it no longer determines current match strength.
+## Novedades
 
-## Dynamic club strength
-Current strength comes from the real best available XI, positional OVR, injuries and coach modifiers. The old fixed 25% ATA/DEF contribution is gone.
+### Continuidad del campeón
+- Solo durante **el mercado posterior al título**, el campeón conserva un recuerdo de su XI y núcleo al abrir la ventana.
+- La IA puede vender jugadores importantes, pero bloquea operaciones que provoquen un deterioro acumulado excesivo del XI.
+- Puede autorizar una venta extraordinaria hacia un destino deportivo superior por una prima importante; no admite una cadena de ventas que destruya medio equipo.
+- La protección también se aplica a los intercambios 1x1 y 2x1.
+- La base del mercado **no se reinicia** al pulsar varias veces «Mercado automático».
+- **No hay bonificación en partidos, puntos adicionales ni inmunidad al descenso.**
 
-Club pages now show dynamic XI, ATA, DEF and squad average.
+### Retorno inmediato tras descenso
+- Ya no se aplica `reconstrucción` automáticamente a cualquier descendido.
+- Se compara su XI con el nivel de los tres mejores equipos de la siguiente Segunda.
+- Si mantiene calidad suficiente, el plan es **`retorno`** y conserva una política de ventas prudente.
+- Si su plantilla queda claramente por debajo de la Segunda competitiva, conserva el plan `reconstrucción`.
+- No se alteran ratings ni presupuestos por este plan.
 
-## Player potential and development
-Players now have:
-- `POT` (40–99 ceiling)
-- visible trend `▲ +3` to `▼ -3`
+### Ajuste de diagnóstico
+- El botón de tests ya no destruye el identificador del cartel de resultados al ejecutar la primera batería.
 
-Development uses age, potential gap, minutes, accumulated injury burden, Cantera coaching and a small random variation.
+## Validación
 
-## Smart market
-There is NO hard five-move cap. Activity falls progressively as a club completes more business, but clubs can go beyond five moves if their plan still calls for it.
+- Core: 60/60
+- Economía/mercado VM 1.1: 9/9
+- Draft VM 1.2: 8/8
+- Balance VM 1.3: 7/7
+- Mercado y potencial VM 1.4: 8/8
+- Autosave: 6/6
+- Nuevos tests 1.4.1: 8/8
+- **TOTAL 106/106 pruebas aprobadas** en un navegador Chromium de pruebas.
 
-Each player can change club only ONCE per transfer window. This applies to normal transfers, free agents and exchanges.
+Save real T33: Los Dragones (XI 86,36) y Sarracenos de Bucarest (XI 84,82) reciben `retorno`; Infernus, campeón T33, queda marcado para conservar continuidad. Tras un mercado automático desde el save real, el XI de Infernus pasó de 87,09 a 88,09. En ese verano, 78 movimientos correspondieron a 78 futbolistas diferentes. En un segundo clic, el nivel de referencia inicial se conservó.
 
-### Protected core, not sacred cows
-At market opening every club identifies an original core from current quality + future value.
-- Core players cannot move directly to a worse sporting destination.
-- Segunda cannot normally poach a Primera core player.
-- At most one original core player is sold directly in a summer.
-- After a core sale, healthy non-declining starters receive extra protection.
-- Clubs that have already weakened materially stop selling useful starters.
-- Declining veterans and surplus players remain easier to move.
-
-A Segunda star can still leave for a clearly stronger Primera club.
-
-## Market plans
-Each club uses one plan: `Competir`, `Ascenso`, `Consolidación`, `Estable` or `Reconstrucción`.
-
-Division, recent finish, actual XI, promotion/relegation and stagnation affect the plan. A historically stagnant D2 club that now owns an elite squad is treated as an Ascenso project rather than being dismantled.
-
-## Smarter valuation
-Market decisions consider current positional gain, future development, age/decline, sporting destination, seller surplus, plan, protected status and budget.
-
-This allows the AI to prefer, for example, a 75 OVR youngster with strong growth over an 81 OVR veteran already declining.
-
-## Exchanges
-Rare coherent deals can be:
-- 1 player ↔ 1 player + cash
-- occasional 2 players ↔ 1 player + cash
-
-Both final squads must remain legal by total size and position limits.
-
-## Economy
-Potential affects transfer value but NOT operating cost. Squad maintenance uses current squad/XI quality and roster size, preventing future potential from draining budgets artificially.
-
-## Validation summary
-- Core engine: 60/60
-- VM 1.1 market/economy: 9/9
-- VM 1.2 draft: 8/8
-- VM 1.3 balance: 7/7
-- VM 1.4 smart market/development: 9/9
-- Gameplay/balance total: 93/93 PASS
-
-The autosave suite is preserved from VM 1.3.1. In the opaque browser sandbox, 5/6 diagnostics execute; the only unavailable test directly accesses `localStorage`, which that sandbox blocks.
-
-Long-run stress:
-- 3 independent universes × 30 seasons
-- ~70.4 player movements per summer on average
-- clubs reached 11–12 movement legs in a summer
-- 0 roster/position violations
-- final average XI ≈ 83.3
-- final budget median across the three runs ≈ 105M
-
-Real T23 save probe:
-- Juglares: legacy 66 → dynamic XI ≈82.6 / displayed OVR 83
-- plan becomes Ascenso
-- one smart-market probe ended at XI ≈82.8
-- Jinetes: XI ≈76.9 → ≈78.1 in the same probe
-- duplicate same-window player moves: 0
-
-Mobile layout: no horizontal overflow at 320, 390 or 430 px.
+**Nota:** las pruebas han sido en Chromium, no en Safari/iOS físico. Es recomendable comprobar en el iPhone un partido → salir → entrar sin pulsar Guardar para validar el autoguardado en tu dispositivo.

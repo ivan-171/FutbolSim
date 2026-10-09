@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="LeagueForge">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-<title>LeagueForge VM 1.4 — Mobile Dynasty</title>
+<title>LeagueForge VM 1.4.1 — Mobile Dynasty</title>
 <style>
 :root{
  --bg:#08101d;--panel:#111c31;--panel2:#16243d;--line:#273a5d;--text:#f4f7ff;--muted:#91a5c5;
@@ -414,7 +414,7 @@ input,select{font-size:16px!important;min-height:46px;border-radius:12px}label{f
       <div class="modeCard" data-mode-card="random"><b>🎲 Azar total</b><span>Ni ratings ni localía: puro caos estadístico.</span></div>
      </div><div id="modeInfo" class="muted small"></div>
   </div>
-  <div class="card"><h3>Estructura</h3><div id="setupInfo"></div><div class="muted small" style="margin-top:10px">La Copa incluye a todos los clubes activos. Al final de cada temporada se abre el mercado antes de permitir el inicio de la siguiente. En VM 1.4, la fuerza sale del XI real. El mercado planifica la plantilla, protege el núcleo sin hacerlo intocable y los jóvenes tienen potencial y desarrollo.</div><div class="systemTools"><div class="label">Diagnóstico</div><div class="muted tiny" style="margin:4px 0 9px">La suite guarda tu partida, prueba el motor y la restaura.</div><button class="btn" id="runTestsBtn">🧪 Ejecutar tests VM 1.4</button></div></div>
+  <div class="card"><h3>Estructura</h3><div id="setupInfo"></div><div class="muted small" style="margin-top:10px">La Copa incluye a todos los clubes activos. Al final de cada temporada se abre el mercado antes de permitir el inicio de la siguiente. En VM 1.4.1, la fuerza sale del XI real. El mercado planifica la plantilla, protege el núcleo sin hacerlo intocable y los jóvenes tienen potencial y desarrollo.</div><div class="systemTools"><div class="label">Diagnóstico</div><div class="muted tiny" style="margin:4px 0 9px">La suite guarda tu partida, prueba el motor y la restaura.</div><button class="btn" id="runTestsBtn">🧪 Ejecutar tests VM 1.4.1</button></div></div>
  </div>
 </div>
 
@@ -805,7 +805,7 @@ function vm14TwoForOneCandidate(buyer,target){
  for(let i=0;i<opts.length;i++)for(let j=i+1;j<opts.length;j++){const q1=opts[i],q2=opts[j];if(!needs.includes(q1.pos)&&!needs.includes(q2.pos))continue;const buyerAfter=buyer.players.filter(x=>x.id!==q1.id&&x.id!==q2.id).concat([p]),sellerAfter=seller.players.filter(x=>x.id!==p.id).concat([q1,q2]);if(!vm14RosterLegal(buyerAfter)||!vm14RosterLegal(sellerAfter))continue;const pv=playerValue(p),qv=playerValue(q1)+playerValue(q2),cash=Math.max(0,Math.round((pv-qv)*.65*10)/10);if(cash>buyer.budget)continue;const future=q1.ovr+q2.ovr+(vm14ProjectedDelta(q1,seller)+vm14ProjectedDelta(q2,seller))*2;if(future<p.ovr*1.55)continue;return{seller,buyer,p,qs:[q1,q2],cash}}
  return null
 }
-function vm14ExecutePackage(x){if(!x)return false;const{seller,buyer,p,qs,cash}=x;if(vm14MovedThisWindow(p)||qs.some(vm14MovedThisWindow)||buyer.budget<cash)return false;const buyerAfter=buyer.players.filter(z=>!qs.some(q=>q.id===z.id)).concat([p]),sellerAfter=seller.players.filter(z=>z.id!==p.id).concat(qs);if(!vm14RosterLegal(buyerAfter)||!vm14RosterLegal(sellerAfter))return false;buyer.players=buyerAfter;seller.players=sellerAfter;p.teamId=buyer.id;for(const q of qs)q.teamId=seller.id;clubBucket(p,buyer.id);qs.forEach(q=>clubBucket(q,seller.id));buyer.budget=Math.round((buyer.budget-cash)*10)/10;seller.budget=Math.round(clamp(seller.budget+cash,3,135)*10)/10;const swapId='pkg-'+world.season.no+'-'+p.id+'-'+qs.map(q=>q.id).join('-');const moves=[[p,seller,buyer,cash],...qs.map(q=>[q,buyer,seller,0])];for(const[pl,from,to,fee]of moves){pl.transferHistory=pl.transferHistory||[];pl.transferHistory.push({season:world.season.no,from:from.id,to:to.id,fee,swapId,package:true});world.transferRecords.push({season:world.season.no,playerId:pl.id,playerName:pl.name,sellerId:from.id,sellerName:from.name,buyerId:to.id,buyerName:to.name,fee,swapId,package:true})}world.transferLog.unshift(`🔁 2x1: ${p.name} → ${buyer.name}; ${qs.map(q=>q.name).join(' + ')} → ${seller.name}${cash?` + ${cash.toFixed(1)}M`:''}`);vm14SyncTeamRatings(seller);vm14SyncTeamRatings(buyer);return true}
+function vm14ExecutePackage(x){if(!x)return false;const{seller,buyer,p,qs,cash}=x;if(vm14MovedThisWindow(p)||qs.some(vm14MovedThisWindow)||buyer.budget<cash)return false;const buyerAfter=buyer.players.filter(z=>!qs.some(q=>q.id===z.id)).concat([p]),sellerAfter=seller.players.filter(z=>z.id!==p.id).concat(qs);if(!vm14RosterLegal(buyerAfter)||!vm14RosterLegal(sellerAfter))return false;if(!vm141ChampionExchangeAllowed(seller,[p],qs)||!vm141ChampionExchangeAllowed(buyer,qs,[p]))return false;buyer.players=buyerAfter;seller.players=sellerAfter;p.teamId=buyer.id;for(const q of qs)q.teamId=seller.id;clubBucket(p,buyer.id);qs.forEach(q=>clubBucket(q,seller.id));buyer.budget=Math.round((buyer.budget-cash)*10)/10;seller.budget=Math.round(clamp(seller.budget+cash,3,135)*10)/10;const swapId='pkg-'+world.season.no+'-'+p.id+'-'+qs.map(q=>q.id).join('-');const moves=[[p,seller,buyer,cash],...qs.map(q=>[q,buyer,seller,0])];for(const[pl,from,to,fee]of moves){pl.transferHistory=pl.transferHistory||[];pl.transferHistory.push({season:world.season.no,from:from.id,to:to.id,fee,swapId,package:true});world.transferRecords.push({season:world.season.no,playerId:pl.id,playerName:pl.name,sellerId:from.id,sellerName:from.name,buyerId:to.id,buyerName:to.name,fee,swapId,package:true})}world.transferLog.unshift(`🔁 2x1: ${p.name} → ${buyer.name}; ${qs.map(q=>q.name).join(' + ')} → ${seller.name}${cash?` + ${cash.toFixed(1)}M`:''}`);vm14SyncTeamRatings(seller);vm14SyncTeamRatings(buyer);return true}
 function openMarket(){world.phase='market';world.offseason={fromD1:[...world.season.d1ids],fromD2:[...world.season.d2ids]};world.offers=[];world.transferLog=[];generateOffers(12);autosave('market open');if(!TESTING)renderAll()}
 function saleBlockReason(seller,p){if(!seller||!p)return'Operación inválida';if(seller.players.length<=16)return'El club debe conservar al menos 16 jugadores';if(p.pos==='POR'&&seller.players.filter(x=>x.pos==='POR').length<=1)return'El club debe conservar al menos un portero';return null}
 function ensureSquadDepth(t){while(t.players.filter(p=>p.pos==='POR').length<2)t.players.push(makePlayer(t.id,'POR',Math.max(58,t.ovr-9),17+ri(3)));while(t.players.length<18)t.players.push(makePlayer(t.id,leastCoveredPosition(t),Math.max(58,t.ovr-8),17+ri(3)))}
@@ -1618,7 +1618,7 @@ function vm11CompactWorld(w){
  for(const p of (x.retired||[])){if(p.transferHistory?.length>8)p.transferHistory=p.transferHistory.slice(-8)}
  if(x.freeAgents?.length>80)x.freeAgents=x.freeAgents.sort((a,b)=>b.ovr-a.ovr).slice(0,80);return x;
 }
-function statePayload(){if(world)world.rngState=rngState;return{version:'5.4',client:'VM1.4',savedAt:Date.now(),nextTeamId,nextPlayerId,world:world?vm11CompactWorld(world):null,setup:world?null:{teams:structuredClone(teams)}}}
+function statePayload(){if(world)world.rngState=rngState;return{version:'5.4.1',client:'VM1.4.1',savedAt:Date.now(),nextTeamId,nextPlayerId,world:world?vm11CompactWorld(world):null,setup:world?null:{teams:structuredClone(teams)}}}
 function normalizeWorldV5(w){
  if(!w)return w;(w.teams||[]).forEach(ensureTeamV5);(w.retired||[]).forEach(p=>{p.clubCareer=p.clubCareer||{};p.transferHistory=p.transferHistory||[]});
  if(w.economyVersion!=='VM1.3'){for(const t of (w.teams||[])){const old=Number.isFinite(t.budget)?t.budget:25;t.budget=Math.round(clamp(25+Math.max(0,Math.min(old,160)-25)*.72,8,120)*10)/10}w.economyVersion='VM1.3'}
@@ -1652,9 +1652,9 @@ function manualSave(){
 async function vm11CompactExistingStorage(){
  try{
   const all=await vmAll();if(!all.length)return;const latest=[...all].sort((a,b)=>b.savedAt-a.savedAt)[0];
-  if(latest?.payload?.world){const compact={version:'5.4',client:'VM1.4',savedAt:latest.payload.savedAt||Date.now(),nextTeamId:latest.payload.nextTeamId||nextTeamId,nextPlayerId:latest.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(latest.payload.world)),setup:null};await vmPut('autosave',compact,'Autosave migrado')}
-  const manual=all.find(x=>x.slot==='manual');if(manual?.payload?.world){const compact={version:'5.4',client:'VM1.4',savedAt:manual.payload.savedAt||Date.now(),nextTeamId:manual.payload.nextTeamId||nextTeamId,nextPlayerId:manual.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(manual.payload.world)),setup:null};await vmPut('manual',compact,'Manual migrado')}
-  const snaps=all.filter(x=>x.slot.startsWith('snap-')).sort((a,b)=>b.savedAt-a.savedAt);for(const rec of snaps.slice(0,2)){if(rec.payload?.world)await vmPut(rec.slot,{version:'5.4',client:'VM1.4',savedAt:rec.payload.savedAt||rec.savedAt||Date.now(),nextTeamId:rec.payload.nextTeamId||nextTeamId,nextPlayerId:rec.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(rec.payload.world)),setup:null},rec.label)}for(const rec of snaps.slice(2))await vm11Delete(rec.slot);
+  if(latest?.payload?.world){const compact={version:'5.4.1',client:'VM1.4.1',savedAt:latest.payload.savedAt||Date.now(),nextTeamId:latest.payload.nextTeamId||nextTeamId,nextPlayerId:latest.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(latest.payload.world)),setup:null};await vmPut('autosave',compact,'Autosave migrado')}
+  const manual=all.find(x=>x.slot==='manual');if(manual?.payload?.world){const compact={version:'5.4.1',client:'VM1.4.1',savedAt:manual.payload.savedAt||Date.now(),nextTeamId:manual.payload.nextTeamId||nextTeamId,nextPlayerId:manual.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(manual.payload.world)),setup:null};await vmPut('manual',compact,'Manual migrado')}
+  const snaps=all.filter(x=>x.slot.startsWith('snap-')).sort((a,b)=>b.savedAt-a.savedAt);for(const rec of snaps.slice(0,2)){if(rec.payload?.world)await vmPut(rec.slot,{version:'5.4.1',client:'VM1.4.1',savedAt:rec.payload.savedAt||rec.savedAt||Date.now(),nextTeamId:rec.payload.nextTeamId||nextTeamId,nextPlayerId:rec.payload.nextPlayerId||nextPlayerId,world:vm11CompactWorld(normalizeWorldV5(rec.payload.world)),setup:null},rec.label)}for(const rec of snaps.slice(2))await vm11Delete(rec.slot);
   for(const key of [AUTO_SAVE_KEY,MANUAL_SAVE_KEY,LEGACY_SAVE_KEY,LEGACY_SAVE_KEY2]){try{const raw=localStorage.getItem(key);if(raw&&raw.length>3_500_000)localStorage.removeItem(key)}catch{}}
  }catch{}
 }
@@ -1817,7 +1817,7 @@ function vm131AutosaveSelfTest(){
   const old=world;
   try{
    if(!world)world={rngState:1,teams:[],history:[],season:{}};
-   const p=statePayload();if(p.version!=='5.4'||p.client!=='VM1.4')throw new Error('schema');
+   const p=statePayload();if(p.version!=='5.4.1'||p.client!=='VM1.4.1')throw new Error('schema');
   }finally{world=old}
  });
  t('Serial save queue exists',()=>{if(typeof vmSaveChain?.then!=='function')throw new Error('queue')});
@@ -1826,6 +1826,60 @@ function vm131AutosaveSelfTest(){
  return out;
 }
 
+
+
+/* ---------- VM 1.4.1 — CONTINUIDAD Y RETORNO ---------- */
+function vm141RelegatedPlan(t){
+ const d2=world.teams.filter(x=>vm14NextDivision(x)==='d2');
+ const qualities=d2.map(x=>vm14DynamicRatings(x,false).ovr).sort((a,b)=>b-a);
+ const ours=vm14DynamicRatings(t,false).ovr;
+ const benchmark=qualities[Math.min(2,qualities.length-1)]??ours;
+ // At or near the three strongest squads in Segunda: promotion candidate, not a rebuild.
+ return ours>=benchmark-.65?'retorno':'reconstrucción';
+}
+function vm141OriginalSoldCount(t,ids){
+ const original=new Set(ids||[]);
+ return new Set((world.transferRecords||[]).filter(x=>x.season===world.season.no&&x.sellerId===t.id&&original.has(x.playerId)).map(x=>x.playerId)).size;
+}
+function vm141ChampionDirectSaleAllowed(seller,p,buyer,fee){
+ const plan=world?.marketPlans?.[seller?.id];
+ if(!plan?.defendingChampion||!p||!buyer)return true;
+ const baseline=Number(plan.startXi)||vm14DynamicRatings(seller,false).ovr;
+ const remaining=vm14DynamicRatings(seller,false,p.id).ovr;
+ const decline=baseline-remaining;
+ const originalCore=(plan.startCoreIds||[]).includes(p.id);
+ const originalStarter=(plan.startStarterIds||[]).includes(p.id);
+ const coreLost=vm141OriginalSoldCount(seller,plan.startCoreIds);
+ const startersLost=vm141OriginalSoldCount(seller,plan.startStarterIds);
+ const leap=vm14SportingScore(buyer)-vm14SportingScore(seller);
+ const hugeBid=leap>=9&&fee>=playerValue(p)*1.25;
+ // Even an attractive bid should not allow wholesale destruction of the reigning XI.
+ if(decline>3.1)return false;
+ if(decline>2.0&&!hugeBid)return false;
+ if(originalCore&&coreLost>=1&&!hugeBid)return false;
+ if(originalStarter&&startersLost>=2&&decline>.8)return false;
+ return true;
+}
+function vm141ChampionExchangeAllowed(t,outgoing,incoming){
+ const plan=world?.marketPlans?.[t?.id];
+ if(!plan?.defendingChampion)return true;
+ const leavingIds=new Set(outgoing.map(x=>x.id));
+ const afterPlayers=t.players.filter(p=>!leavingIds.has(p.id)).concat(incoming);
+ const after=vm14DynamicRatings({...t,players:afterPlayers},false).ovr;
+ const lostCore=vm141OriginalSoldCount(t,plan.startCoreIds);
+ const lostStarter=vm141OriginalSoldCount(t,plan.startStarterIds);
+ const newCore=outgoing.filter(p=>(plan.startCoreIds||[]).includes(p.id)).length;
+ const newStarter=outgoing.filter(p=>(plan.startStarterIds||[]).includes(p.id)).length;
+ // Exchanges may legitimately reduce short-term quality, but no cascading sell-off.
+ if(after<(Number(plan.startXi)||after)-2.25)return false;
+ if(newCore+lostCore>=3)return false;
+ if(newStarter+lostStarter>=4&&after<(Number(plan.startXi)||after)-.6)return false;
+ return true;
+}
+function vm141PlanReport(t){
+ const plan=world?.marketPlans?.[t.id]||vm14PlanFor(t);
+ return{club:t.name,plan:plan.type,xi:vm14DynamicRatings(t,false).ovr,baseline:plan.startXi,champion:!!plan.defendingChampion};
+}
 
 /* ---------- VM 1.4 DYNAMIC CLUBS + SMART MARKET + DEVELOPMENT ---------- */
 function vm14Hash01(id,salt=0){let x=((Number(id)||1)*2654435761+(salt+1)*1013904223)>>>0;x^=x>>>16;x=Math.imul(x,2246822519)>>>0;x^=x>>>13;return(x>>>0)/4294967296}
@@ -1869,7 +1923,7 @@ function makePlayer(teamId,pos,base=72,age=null,name=null){
 function normalizeWorldV5(w){
  if(!w)return w;(w.teams||[]).forEach(ensureTeamV5);(w.retired||[]).forEach(p=>{p.clubCareer=p.clubCareer||{};p.transferHistory=p.transferHistory||[];vm14EnsureDevelopment(p)});(w.freeAgents||[]).forEach(vm14EnsureDevelopment);
  if(w.economyVersion!=='VM1.3'){for(const t of(w.teams||[])){const old=Number.isFinite(t.budget)?t.budget:25;t.budget=Math.round(clamp(25+Math.max(0,Math.min(old,160)-25)*.72,8,120)*10)/10}w.economyVersion='VM1.3'}
- w.marketConfig=w.marketConfig||{mode:'coherent'};w.marketMemory=w.marketMemory||{recentBuyers:[],offerCount:{},recentSellers:[],sellerOfferCount:{}};w.marketMemory.sellerOfferCount=w.marketMemory.sellerOfferCount||{};w.transferRecords=w.transferRecords||[];w.marketHistory=w.marketHistory||[];w.draftHistory=w.draftHistory||[];w.freeAgents=w.freeAgents||[];w.financeHistory=w.financeHistory||[];w.history=w.history||[];w.marketPlans=w.marketPlans||{};w.marketVersion='VM1.4';
+ w.marketConfig=w.marketConfig||{mode:'coherent'};w.marketMemory=w.marketMemory||{recentBuyers:[],offerCount:{},recentSellers:[],sellerOfferCount:{}};w.marketMemory.sellerOfferCount=w.marketMemory.sellerOfferCount||{};w.transferRecords=w.transferRecords||[];w.marketHistory=w.marketHistory||[];w.draftHistory=w.draftHistory||[];w.freeAgents=w.freeAgents||[];w.financeHistory=w.financeHistory||[];w.history=w.history||[];w.marketPlans=w.marketPlans||{};w.marketVersion='VM1.4.1';
  w.history.forEach(h=>{h.d1=h.d1||[];h.d2=h.d2||[];delete h.playerStats;h.championId=h.championId||h.d1?.[0]?.id||null;h.lastSecondId=h.lastSecondId||h.d2?.[h.d2.length-1]?.id||null;if(!('cupFinalist'in h))h.cupFinalist=null;if(!('cupFinalistId'in h))h.cupFinalistId=null});return w
 }
 function injuryCheck(t,xi){if(random()>.18)return null;const p=pick(xi);if(!p)return null;const duration=ri(5,1);p.injury=duration;p.injuryCount=(p.injuryCount||0)+1;p.injuryBurden=(p.injuryBurden||0)+duration;world.news.unshift(`🏥 ${p.name} (${t.name}) estará lesionado ${p.injury} partidos.`);return p}
@@ -1888,13 +1942,57 @@ function runDraft(d1,d2){
 function vm14LastRow(t){const h=world?.history?.[world.history.length-1];if(!h)return null;let i=(h.d1||[]).findIndex(x=>x.id===t.id);if(i>=0)return{div:'d1',pos:i+1,total:h.d1.length,row:h.d1[i]};i=(h.d2||[]).findIndex(x=>x.id===t.id);return i>=0?{div:'d2',pos:i+1,total:h.d2.length,row:h.d2[i]}:null}
 function vm14NextDivision(t){if(wasPromoted(t.id))return'd1';if(wasRelegated(t.id))return'd2';return vm14LastRow(t)?.div||lastDivisionOf(t.id)}
 function vm14SportingScore(t){const r=vm14LastRow(t),div=vm14NextDivision(t),strength=vm14DynamicRatings(t,false).ovr;let s=strength*.5+(div==='d1'?26:8)+vm11ClubPrestige(t)*.18;if(r){const ratio=r.total<=1?1:(r.total-r.pos)/(r.total-1);s+=ratio*(div==='d1'?16:10)}if(wasPromoted(t.id))s+=5;if(wasRelegated(t.id))s-=3;return s}
-function vm14PlanFor(t){const r=vm14LastRow(t),div=vm14NextDivision(t),st=vm13Stagnation(t);let type='estable';if(wasPromoted(t.id))type='consolidación';else if(wasRelegated(t.id))type='reconstrucción';else if(div==='d1'&&r?.pos<=3)type='competir';else if(div==='d2'&&r?.pos<=4)type='ascenso';else if(st.active)type='reconstrucción';const needs=[...POS].map(pos=>({pos,score:vm11NeedScore(t,pos)+Math.max(0,vm14DynamicRatings(t,false).ovr-positionAverage(t,pos))*1.2})).sort((a,b)=>b.score-a.score);return{teamId:t.id,type,startXi:vm14DynamicRatings(t,false).ovr,startByPos:Object.fromEntries(POS.map(pos=>[pos,positionAverage(t,pos)])),needs:needs.map(x=>x.pos),score:vm14SportingScore(t)}}
-function vm14InitPlans(){world.marketPlans={};for(const t of world.teams)world.marketPlans[t.id]=vm14PlanFor(t)}
+function vm14PlanFor(t){
+ const r=vm14LastRow(t),div=vm14NextDivision(t),st=vm13Stagnation(t);
+ const xi=vm14DynamicRatings(t,false).ovr;
+ const defendingChampion=lastSnapshot()?.championId===t.id;
+ let type='estable';
+ if(wasPromoted(t.id))type='consolidación';
+ else if(wasRelegated(t.id))type=vm141RelegatedPlan(t);
+ else if(div==='d1'&&r?.pos<=3)type='competir';
+ else if(div==='d2'&&r?.pos<=4)type='ascenso';
+ else if(st.active)type='reconstrucción';
+ // Relegation/stagnation do not mean automatic dismantling for a high-quality squad.
+ if(div==='d2'&&st.active&&xi>=Math.max(78,vm141RelegatedPlan(t)==='retorno'?xi:82))type='ascenso';
+ const needs=[...POS].map(pos=>({pos,score:vm11NeedScore(t,pos)+Math.max(0,xi-positionAverage(t,pos))*1.2})).sort((a,b)=>b.score-a.score);
+ const starters=vm14MakeLineup(t,false);
+ const ranked=[...starters].sort((a,b)=>(b.ovr+Math.max(0,vm14ProjectedDelta(b,t)))-(a.ovr+Math.max(0,vm14ProjectedDelta(a,t))));
+ return{teamId:t.id,type,startXi:xi,startByPos:Object.fromEntries(POS.map(pos=>[pos,positionAverage(t,pos)])),needs:needs.map(x=>x.pos),score:vm14SportingScore(t),defendingChampion,startStarterIds:starters.map(p=>p.id),startCoreIds:ranked.slice(0,5).map(p=>p.id)};
+}
+function vm14InitPlans(force=false){
+ const existing=world.marketPlans||{};
+ const hasPlans=world.teams.every(t=>existing[t.id]&&Number.isFinite(existing[t.id].startXi));
+ const valid=world.phase==='market'&&!force&&hasPlans&&(world.marketPlanSeason===world.season.no||world.marketPlanSeason==null);
+ if(valid){
+  // Old 1.4 saves already in the market get the new plan type, keeping their original baseline.
+  for(const t of world.teams){
+   const previous=existing[t.id],fresh=vm14PlanFor(t);
+   previous.type=fresh.type;
+   previous.defendingChampion=fresh.defendingChampion;
+   if(!Array.isArray(previous.startCoreIds))previous.startCoreIds=fresh.startCoreIds;
+   if(!Array.isArray(previous.startStarterIds))previous.startStarterIds=fresh.startStarterIds;
+  }
+  world.marketPlanSeason=world.season.no;
+  return;
+ }
+ world.marketPlans={};for(const t of world.teams)world.marketPlans[t.id]=vm14PlanFor(t);
+ world.marketPlanSeason=world.season.no;
+}
 function vm14MovedThisWindow(pOrId){const id=typeof pOrId==='object'?pOrId?.id:pOrId;return(world?.transferRecords||[]).some(x=>x.season===world.season.no&&x.playerId===id)}
 function vm14IsStarter(t,p){return vm14MakeLineup(t,false).some(x=>x.id===p.id)}
 function vm14CoreRank(t,p){const arr=[...t.players].sort((a,b)=>(b.ovr+Math.max(0,vm14ProjectedDelta(b,t))*1.5)-(a.ovr+Math.max(0,vm14ProjectedDelta(a,t))*1.5));return arr.findIndex(x=>x.id===p.id)}
 function vm14SaleImpact(t,p){return vm14DynamicRatings(t,false).ovr-vm14DynamicRatings(t,false,p.id).ovr}
-function vm14CanSellTo(seller,p,buyer,fee){if(!seller||!p||!buyer)return false;if(vm14MovedThisWindow(p))return false;const rank=vm14CoreRank(seller,p),core=rank>=0&&rank<4,impact=vm14SaleImpact(seller,p),jump=vm14SportingScore(buyer)-vm14SportingScore(seller),plan=world.marketPlans?.[seller.id]?.type||'estable',premium=fee/Math.max(.1,playerValue(p));if(core&&jump<2&&premium<1.30)return false;if(core&&jump<7&&plan!=='reconstrucción'&&premium<1.18)return false;if(impact>3.5&&jump<10&&plan!=='reconstrucción')return false;if(vm14NextDivision(buyer)==='d2'&&vm14NextDivision(seller)==='d1'&&core&&!wasRelegated(seller.id))return false;return true}
+function vm14CanSellTo(seller,p,buyer,fee){
+ if(!seller||!p||!buyer)return false;
+ if(vm14MovedThisWindow(p))return false;
+ if(!vm141ChampionDirectSaleAllowed(seller,p,buyer,fee))return false;
+ const rank=vm14CoreRank(seller,p),core=rank>=0&&rank<4,impact=vm14SaleImpact(seller,p),jump=vm14SportingScore(buyer)-vm14SportingScore(seller),plan=world.marketPlans?.[seller.id]?.type||'estable',premium=fee/Math.max(.1,playerValue(p));
+ if(core&&jump<2&&premium<1.30)return false;
+ if(core&&jump<7&&plan!=='reconstrucción'&&premium<1.18)return false;
+ if(impact>3.5&&jump<10&&plan!=='reconstrucción')return false;
+ if(vm14NextDivision(buyer)==='d2'&&vm14NextDivision(seller)==='d1'&&core&&!wasRelegated(seller.id))return false;
+ return true;
+}
 function vm11IncomingLimit(t){return Number.POSITIVE_INFINITY}
 function vm11OutgoingLimit(t){return Number.POSITIVE_INFINITY}
 function vm11BuyerCapacity(t,p){if(!t||!p||vm14MovedThisWindow(p))return false;if(t.players.length<VM11_ROSTER.maxTotal&&vm11PosCount(t,p.pos)<VM11_ROSTER[p.pos].max)return true;if(vm11PosCount(t,p.pos)>=VM11_ROSTER[p.pos].max&&t.players.some(x=>x.pos===p.pos&&!x.retired&&x.id!==p.id))return true;if(t.players.length>=VM11_ROSTER.maxTotal&&t.players.some(x=>vm11PosCount(t,x.pos)>VM11_ROSTER[x.pos].min))return true;return false}
@@ -1916,10 +2014,10 @@ function transferPlayer(playerId,buyerId,fee){
 function vm11SignFreeAgent(t,p,fee=0){if(!p||vm14MovedThisWindow(p)||!vm11BuyerCapacity(t,p)||t.budget<fee)return false;world.freeAgents=(world.freeAgents||[]).filter(x=>x.id!==p.id);t.players.push(p);p.teamId=t.id;clubBucket(p,t.id);vm13ResolveIncomingRoster(t,p);p.transferHistory=p.transferHistory||[];p.transferHistory.push({season:world.season.no,from:null,to:t.id,fee,freeAgent:true});t.budget=Math.round((t.budget-fee)*10)/10;world.transferRecords.push({season:world.season.no,playerId:p.id,playerName:p.name,sellerId:null,sellerName:'Agente libre',buyerId:t.id,buyerName:t.name,fee,freeAgent:true});world.transferLog.unshift(`${p.name}: agente libre → ${t.name} por ${fee.toFixed(1)}M`);vm14SyncTeamRatings(t);return true}
 function vm14SwapCandidate(buyer,target){
  const seller=target?.seller,p=target?.p;if(!seller||!p||vm14MovedThisWindow(p))return null;const sellerPlan=world.marketPlans?.[seller.id]||vm14PlanFor(seller),wanted=sellerPlan.needs?.[0];const options=buyer.players.filter(q=>!vm14MovedThisWindow(q)&&!saleBlockReason(buyer,q)&&q.pos===wanted&&q.id!==p.id&&vm14CoreRank(buyer,q)>=4).sort((a,b)=>(b.ovr+Math.max(0,vm14ProjectedDelta(b,seller))*2)-(a.ovr+Math.max(0,vm14ProjectedDelta(a,seller))*2));const q=options[0];if(!q)return null;const pv=playerValue(p),qv=playerValue(q),cash=Math.max(0,Math.round((pv-qv)*.72*10)/10);if(cash>buyer.budget)return null;const futureQ=q.ovr+vm14ProjectedDelta(q,seller)*2,futureP=p.ovr+vm14ProjectedDelta(p,buyer)*2;if(futureQ<positionAverage(seller,q.pos)-3)return null;return{seller,buyer,p,q,cash}}
-function vm14ExecuteSwap(x){if(!x)return false;const{seller,buyer,p,q,cash}=x;if(vm14MovedThisWindow(p)||vm14MovedThisWindow(q)||buyer.budget<cash)return false;if(!seller.players.some(z=>z.id===p.id)||!buyer.players.some(z=>z.id===q.id))return false;const sellerAfter=seller.players.filter(z=>z.id!==p.id).concat([q]),buyerAfter=buyer.players.filter(z=>z.id!==q.id).concat([p]);if(!vm14RosterLegal(sellerAfter)||!vm14RosterLegal(buyerAfter))return false;seller.players=sellerAfter;buyer.players=buyerAfter;p.teamId=buyer.id;q.teamId=seller.id;clubBucket(p,buyer.id);clubBucket(q,seller.id);buyer.budget=Math.round((buyer.budget-cash)*10)/10;seller.budget=Math.round(clamp(seller.budget+cash,3,135)*10)/10;const swapId='sw-'+world.season.no+'-'+p.id+'-'+q.id;for(const [pl,from,to,fee] of[[p,seller,buyer,cash],[q,buyer,seller,0]]){pl.transferHistory=pl.transferHistory||[];pl.transferHistory.push({season:world.season.no,from:from.id,to:to.id,fee,swapId});world.transferRecords.push({season:world.season.no,playerId:pl.id,playerName:pl.name,sellerId:from.id,sellerName:from.name,buyerId:to.id,buyerName:to.name,fee,swapId})}world.transferLog.unshift(`🔁 ${p.name} → ${buyer.name}; ${q.name} → ${seller.name}${cash?` + ${cash.toFixed(1)}M`:''}`);vm14SyncTeamRatings(seller);vm14SyncTeamRatings(buyer);return true}
-function openMarket(){world.phase='market';world.offseason={fromD1:[...world.season.d1ids],fromD2:[...world.season.d2ids]};world.offers=[];world.transferLog=[];world.marketMemory={recentBuyers:[],offerCount:{},recentSellers:[],sellerOfferCount:{}};world.teams.forEach(vm14SyncTeamRatings);vm14InitPlans();generateOffers(12);autosave('market open');if(!TESTING)renderAll()}
+function vm14ExecuteSwap(x){if(!x)return false;const{seller,buyer,p,q,cash}=x;if(vm14MovedThisWindow(p)||vm14MovedThisWindow(q)||buyer.budget<cash)return false;if(!seller.players.some(z=>z.id===p.id)||!buyer.players.some(z=>z.id===q.id))return false;const sellerAfter=seller.players.filter(z=>z.id!==p.id).concat([q]),buyerAfter=buyer.players.filter(z=>z.id!==q.id).concat([p]);if(!vm14RosterLegal(sellerAfter)||!vm14RosterLegal(buyerAfter))return false;if(!vm141ChampionExchangeAllowed(seller,[p],[q])||!vm141ChampionExchangeAllowed(buyer,[q],[p]))return false;seller.players=sellerAfter;buyer.players=buyerAfter;p.teamId=buyer.id;q.teamId=seller.id;clubBucket(p,buyer.id);clubBucket(q,seller.id);buyer.budget=Math.round((buyer.budget-cash)*10)/10;seller.budget=Math.round(clamp(seller.budget+cash,3,135)*10)/10;const swapId='sw-'+world.season.no+'-'+p.id+'-'+q.id;for(const [pl,from,to,fee] of[[p,seller,buyer,cash],[q,buyer,seller,0]]){pl.transferHistory=pl.transferHistory||[];pl.transferHistory.push({season:world.season.no,from:from.id,to:to.id,fee,swapId});world.transferRecords.push({season:world.season.no,playerId:pl.id,playerName:pl.name,sellerId:from.id,sellerName:from.name,buyerId:to.id,buyerName:to.name,fee,swapId})}world.transferLog.unshift(`🔁 ${p.name} → ${buyer.name}; ${q.name} → ${seller.name}${cash?` + ${cash.toFixed(1)}M`:''}`);vm14SyncTeamRatings(seller);vm14SyncTeamRatings(buyer);return true}
+function openMarket(){world.phase='market';world.offseason={fromD1:[...world.season.d1ids],fromD2:[...world.season.d2ids]};world.offers=[];world.transferLog=[];world.marketMemory={recentBuyers:[],offerCount:{},recentSellers:[],sellerOfferCount:{}};world.teams.forEach(vm14SyncTeamRatings);vm14InitPlans(true);generateOffers(12);autosave('market open');if(!TESTING)renderAll()}
 function autoMarket(){
- if(!world||world.phase!=='market')return;vm14InitPlans();const mode=marketMode(),before=world.transferRecords.length,live=!TESTING;if(live)TESTING=true;try{for(const o of world.offers.filter(x=>x.status==='pending')){const p=allPlayers().find(x=>x.id===o.playerId)||(world.freeAgents||[]).find(x=>x.id===o.playerId),v=p?playerValue(p):o.fee,accept=!vm14MovedThisWindow(o.playerId)&&(o.source==='freeAgent'||(mode==='chaos'?random()<.58:o.fee<=v*1.16));offerAction(o.id,accept)}let dry=0;for(let wave=0;wave<7&&dry<2;wave++){let made=0;for(const buyer of shuffle(world.teams)){if(buyer.budget<.5||random()>vm14ActivityFactor(buyer,'in'))continue;const c=mode==='coherent'?coherentCandidate(buyer):chaosCandidate(buyer);if(!c)continue;if(mode==='coherent'&&c.seller&&random()<.06){const pkg=vm14TwoForOneCandidate(buyer,c);if(pkg&&vm14ExecutePackage(pkg)){made++;continue}}if(mode==='coherent'&&c.seller&&random()<.16){const sw=vm14SwapCandidate(buyer,c);if(sw&&vm14ExecuteSwap(sw)){made++;continue}}const offer={id:crypto.randomUUID?crypto.randomUUID():String(random()),playerId:c.p.id,sellerId:c.seller?.id??null,buyerId:buyer.id,fee:c.fee,status:'pending',source:c.freeAgent?'freeAgent':mode};world.offers.push(offer);rememberMarketBuyer(buyer.id,c.seller?.id??null);const ok=offer.source==='freeAgent'||(mode==='chaos'?random()<.62:offer.fee<=playerValue(c.p)*1.22);offerAction(offer.id,ok);if(offer.status==='accepted')made++}dry=made===0?dry+1:0}}
+ if(!world||world.phase!=='market')return;vm14InitPlans();const mode=marketMode(),before=world.transferRecords.length,live=!TESTING;if(live)TESTING=true;try{for(const o of world.offers.filter(x=>x.status==='pending')){const p=allPlayers().find(x=>x.id===o.playerId)||(world.freeAgents||[]).find(x=>x.id===o.playerId),v=p?playerValue(p):o.fee,accept=!vm14MovedThisWindow(o.playerId)&&(o.source==='freeAgent'||(mode==='chaos'?random()<.58:o.fee<=v*1.16));if(accept&&o.sellerId!=null){const seller=team(o.sellerId),buyer=team(o.buyerId);if(seller&&buyer&&p&&!vm141ChampionDirectSaleAllowed(seller,p,buyer,o.fee))accept=false;}offerAction(o.id,accept)}let dry=0;for(let wave=0;wave<7&&dry<2;wave++){let made=0;for(const buyer of shuffle(world.teams)){if(buyer.budget<.5||random()>vm14ActivityFactor(buyer,'in'))continue;const c=mode==='coherent'?coherentCandidate(buyer):chaosCandidate(buyer);if(!c)continue;if(mode==='coherent'&&c.seller&&random()<.06){const pkg=vm14TwoForOneCandidate(buyer,c);if(pkg&&vm14ExecutePackage(pkg)){made++;continue}}if(mode==='coherent'&&c.seller&&random()<.16){const sw=vm14SwapCandidate(buyer,c);if(sw&&vm14ExecuteSwap(sw)){made++;continue}}const offer={id:crypto.randomUUID?crypto.randomUUID():String(random()),playerId:c.p.id,sellerId:c.seller?.id??null,buyerId:buyer.id,fee:c.fee,status:'pending',source:c.freeAgent?'freeAgent':mode};world.offers.push(offer);rememberMarketBuyer(buyer.id,c.seller?.id??null);const ok=(offer.source==='freeAgent'||(mode==='chaos'?random()<.62:offer.fee<=playerValue(c.p)*1.22))&&(!c.seller||vm141ChampionDirectSaleAllowed(c.seller,c.p,buyer,offer.fee));offerAction(offer.id,ok);if(offer.status==='accepted')made++}dry=made===0?dry+1:0}}
  finally{if(live)TESTING=false}world.teams.forEach(vm14SyncTeamRatings);const done=world.transferRecords.length-before;if($('#autoMarketLog')){$('#autoMarketLog').style.display='block';$('#autoMarketLog').textContent=`Mercado automático: ${done} movimientos. Sin límite duro por club; cada jugador solo puede cambiar una vez y la actividad cae cuando el plan de plantilla está cubierto.`}autosave('auto market');if(!TESTING)renderMarket()
 }
 function startNextSeason(){if(!world||world.phase!=='market')return;world.teams.forEach(t=>{vm11FillSquad(t);vm14SyncTeamRatings(t)});world.marketHistory.push({afterSeason:world.season.no,mode:marketMode(),count:world.transferRecords.filter(x=>x.season===world.season.no).length,spend:Math.round(world.transferRecords.filter(x=>x.season===world.season.no).reduce((a,x)=>a+x.fee,0)*10)/10});const m=world.config.movement,d1=sortedFromArchive('d1'),d2=sortedFromArchive('d2'),rel=d1.slice(-m).map(x=>x.id),pro=d2.slice(0,m).map(x=>x.id),newD1=world.offseason.fromD1.filter(id=>!rel.includes(id)).concat(pro),newD2=world.offseason.fromD2.filter(id=>!pro.includes(id)).concat(rel);world.phase='season';initSeason(world.season.no+1,newD1,newD2);world.news.unshift(`📅 Comienza la temporada ${world.season.no}.`);autosave('new season');if(!TESTING){renderAll();switchView('dashboard');note('Nueva temporada iniciada')}}
@@ -2067,7 +2165,7 @@ function runTests(){
   test('Récord de partido se actualiza',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);assert(world.records.biggestWin&&world.records.mostGoalsMatch,'records')});
   test('Rivalidades acumulan encuentros',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);assert(Object.keys(world.rivalries).length===1,'rivalry')});
   test('Hall of Fame tiene candidatos y club',()=>{resetTestWorld();simMatch(world.teams[0],world.teams[1]);const q=careerCandidates()[0];assert(q&&playerMainClubName(q),'hof')});
-  test('Payload es v5.4 compacto',()=>{resetTestWorld();const p=statePayload();assert(p.version==='5.4'&&p.client==='VM1.4'&&!p.teams,'payload')});
+  test('Payload es v5.4.1 compacto',()=>{resetTestWorld();const p=statePayload();assert(p.version==='5.4.1'&&p.client==='VM1.4.1'&&!p.teams,'payload')});
   test('Migración añade coach y marketConfig',()=>{resetTestWorld();delete world.teams[0].coach;delete world.marketConfig;normalizeWorldV5(world);assert(world.teams[0].coach&&world.marketConfig.mode,'migration')});
   test('UI selector plantillas contiene clubes',()=>{resetTestWorld();renderPlayerTeamSelect();assert($('#playerTeamSelect').options.length===world.teams.length,'selector')});
   test('UI cambia entre vistas',()=>{switchView('players');assert($('#players').classList.contains('active'),'view');switchView('dashboard')});
@@ -2079,10 +2177,78 @@ function runTests(){
   TESTING=false;teams=snapshot.teams;nextTeamId=snapshot.nextTeamId;nextPlayerId=snapshot.nextPlayerId;world=snapshot.world;rngState=snapshot.rngState;leagueTab=snapshot.leagueTab;
   $('#mode').value=snapshot.form.mode;$('#topSize').value=snapshot.form.topSize;$('#movement').value=snapshot.form.movement;$('#legs').value=snapshot.form.legs;$('#seedInput').value=snapshot.form.seed;renderTeams();renderPlayerTeamSelect();renderAll();switchView('dashboard');
  }
- const passed=results.filter(x=>x.ok).length,banner=$('#testBanner');banner.style.display='block';banner.id='TEST_RESULT';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '));document.title=`LeagueForge VM 1.3.1 Tests ${passed}/${results.length}`;return results;
+ const passed=results.filter(x=>x.ok).length,banner=$('#testBanner');banner.style.display='block';banner.dataset.testResult='true';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '));document.title=`LeagueForge VM 1.3.1 Tests ${passed}/${results.length}`;return results;
 }
 window.LeagueForge={runTests,createWorld,simLeagueRound,simLeagueAll,simLeagueMatch,simCupRound,simCupMatch,startNextSeason,generateOffers,autoMarket,setLeagueTab(v){leagueTab=v},get world(){return world}};
-$('#runTestsBtn').addEventListener('click',()=>{const core=runTests(),extra=vm11BalanceSelfTest(),draft=vm12DraftSelfTest(),v13=vm13BalanceSelfTest(),save=vm131AutosaveSelfTest(),v14=vm14MarketSelfTest(),results=[...core,...extra,...draft,...v13,...save,...v14],passed=results.filter(x=>x.ok).length;note(`Tests VM 1.4: ${passed}/${results.length} PASS`);const banner=$('#testBanner');banner.style.display='block';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '))});
+
+function vm141ContinuitySelfTest(){
+ const savedWorld=world?structuredClone(world):null,savedTeams=structuredClone(teams),savedPid=nextPlayerId,savedTid=nextTeamId,savedRng=rngState,savedTesting=TESTING;
+ const out=[],check=(name,fn)=>{try{fn();out.push({name,ok:true})}catch(e){out.push({name,ok:false,error:e.message})}};
+ TESTING=true;
+ try{
+  resetTestWorld('ratings',16,8);finishSeasonTest();
+  for(const t of world.teams)t.budget=120;
+  vm14InitPlans(true);
+  check('champion is recognized from last completed season',()=>{const t=team(lastSnapshot().championId);if(!world.marketPlans[t.id].defendingChampion)throw Error('champion missing')});
+  check('strong relegated club gets immediate-return plan',()=>{
+   const ids=lastSnapshot().relegatedIds,t=team(ids[0]);
+   for(const p of t.players){p.ovr=Math.max(p.ovr,96);p.potential=Math.max(p.potential||0,p.ovr)}
+   if(vm14PlanFor(t).type!=='retorno')throw Error('strong relegated forced reconstruction');
+  });
+  check('weak relegated club can still rebuild',()=>{
+   const t=team(lastSnapshot().relegatedIds[1]);
+   for(const p of t.players){p.ovr=65;p.potential=Math.max(p.potential||0,p.ovr)}
+   if(vm14PlanFor(t).type!=='reconstrucción')throw Error('weak relegated did not rebuild');
+  });
+  check('market plan baseline survives repeated auto-market initialization',()=>{
+   const c=team(lastSnapshot().championId),original=world.marketPlans[c.id].startXi;
+   c.players.filter(x=>x.pos==='DEF').forEach(p=>{p.ovr=Math.max(60,p.ovr-5)});
+   vm14InitPlans();if(world.marketPlans[c.id].startXi!==original)throw Error('baseline reset');
+  });
+  check('champion cannot shed 4+ XI points in one sale',()=>{
+   const champ=team(lastSnapshot().championId),buyer=world.teams.find(t=>t.id!==champ.id),p=vm14MakeLineup(champ,false).find(z=>z.pos==='POR');
+   // Build an artificial world with a big starting XI difference for direct-sale check.
+   const plan=world.marketPlans[champ.id],orig=plan.startXi;plan.startXi=vm14DynamicRatings(champ,false,p.id).ovr+4;
+   const blocked=!vm141ChampionDirectSaleAllowed(champ,p,buyer,playerValue(p)*2);
+   plan.startXi=orig;if(!blocked)throw Error('champion can dump full lineup');
+  });
+  check('champion rule does not prohibit every sale',()=>{
+   const c=team(lastSnapshot().championId),b=world.teams.find(t=>t.id!==c.id),nonStarter=c.players.find(p=>!vm14IsStarter(c,p)&&c.players.filter(x=>x.pos===p.pos).length>VM11_ROSTER[p.pos].min);
+   if(!nonStarter)throw Error('no reserve to test');
+   if(!vm141ChampionDirectSaleAllowed(c,nonStarter,b,playerValue(nonStarter)))throw Error('champion cannot release surplus');
+  });
+  check('swaps respect champion squad strength',()=>{
+   const c=team(lastSnapshot().championId),p=vm14MakeLineup(c,false)[0],weak=world.teams.find(t=>t.id!==c.id).players.find(x=>x.ovr<=75)||{id:999999,pos:p.pos,ovr:50};
+   const plan=world.marketPlans[c.id],orig=plan.startXi;plan.startXi=vm14DynamicRatings({...c,players:c.players.filter(x=>x.id!==p.id).concat([weak])},false).ovr+3;
+   const blocked=!vm141ChampionExchangeAllowed(c,[p],[weak]);plan.startXi=orig;
+   if(!blocked)throw Error('swap bypasses continuity');
+  });
+  check('already relegated champion is not given a hidden match bonus',()=>{
+   const c=team(lastSnapshot().championId),a=teamStrength(c).ovr;
+   world.marketPlans[c.id].defendingChampion=false;
+   const b=teamStrength(c).ovr;
+   if(Math.abs(a-b)>.00001)throw Error('champion had match boost');
+  });
+ }finally{
+  world=savedWorld;teams=savedTeams;nextPlayerId=savedPid;nextTeamId=savedTid;rngState=savedRng;TESTING=savedTesting;if(!TESTING)renderAll();
+ }
+ return out;
+}
+// Update old 1.4 market plans as soon as a save is imported or resumed (no additional transfers).
+const vm141OriginalApplySavedPayload=applySavedPayload;
+applySavedPayload=function(payload,announce='Partida cargada'){
+ const result=vm141OriginalApplySavedPayload(payload,announce);
+ if(world?.phase==='market'){
+  vm14InitPlans();
+  if(!TESTING)renderAll();
+ }
+ return result;
+};
+window.LeagueForgeVM.legacySuites141={v11:vm11BalanceSelfTest,v12:vm12DraftSelfTest,v13:vm13BalanceSelfTest};
+window.LeagueForgeVM.vm141Test=vm141ContinuitySelfTest;
+window.LeagueForgeVM.plan141=vm141PlanReport;
+
+$('#runTestsBtn').addEventListener('click',()=>{const core=runTests(),extra=vm11BalanceSelfTest(),draft=vm12DraftSelfTest(),v13=vm13BalanceSelfTest(),save=vm131AutosaveSelfTest(),v14=vm14MarketSelfTest(),v141=vm141ContinuitySelfTest(),results=[...core,...extra,...draft,...v13,...save,...v14,...v141],passed=results.filter(x=>x.ok).length;note(`Tests VM 1.4.1: ${passed}/${results.length} PASS`);const banner=$('#testBanner');banner.style.display='block';banner.textContent=`TEST_RESULT ${passed}/${results.length} PASS`+(passed===results.length?' ✅':' ❌ '+results.filter(x=>!x.ok).map(x=>x.name+': '+x.error).join(' | '))});
 renderTeams();renderPlayerTeamSelect();renderSetup();renderAll();setAutosaveStatus(localStorage.getItem(VM_EMERGENCY_SAVE_KEY)||localStorage.getItem(AUTO_SAVE_KEY)||localStorage.getItem(LEGACY_SAVE_KEY)||localStorage.getItem(LEGACY_SAVE_KEY2)||localStorage.getItem(LEGACY_SAVE_KEY3)?'disponible':'—');
 if(new URLSearchParams(location.search).get('test')==='1')setTimeout(runTests,50);
 })();

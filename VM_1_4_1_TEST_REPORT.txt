@@ -1,0 +1,53 @@
+LEAGUEFORGE VM 1.4.1 — INFORME DE REGRESIÓN
+============================================
+
+Base original: ZIP LeagueForge VM 1.4, index.html 295,797 bytes.
+Version resultante: VM 1.4.1, schema 5.4.1.
+Sin alteraciones al motor de resultados, progreso juvenil, economía o calendario.
+
+PRUEBAS EN CHROMIUM (RENDER Y SCRIPT REAL)
+- Core engine: 60/60 PASS
+- v1.1 balance/economía: 9/9 PASS
+- v1.2 draft: 8/8 PASS
+- v1.3 balance: 7/7 PASS
+- v1.4 market/potential: 8/8 PASS
+- v1.3.1 autosave diagnostics: 6/6 PASS
+- v1.4.1 continuity/relegation: 8/8 PASS
+TOTAL: 106/106 PASS
+
+NUEVOS CASOS DE PRUEBA
+1. Campeón detectado del historial terminado.
+2. Descendido fuerte obtiene plan «retorno».
+3. Descendido débil aún puede entrar en «reconstrucción».
+4. Plan del mercado conserva la referencia inicial en múltiples inicializaciones.
+5. Ventas que destruyen >4 puntos de XI del campeón son rechazadas.
+6. El campeón no tiene todos sus suplentes bloqueados para la venta.
+7. Intercambios no pueden saltarse el límite de deterioro del campeón.
+8. Ningún boost oculto en teamStrength del campeón.
+
+GUARDADO REAL T33
+- Los Dragones, descendido, XI 86.3636 -> plan «retorno».
+- Sarracenos de Bucarest, descendido, XI 84.8182 -> plan «retorno».
+- Infernus, campeón T33, XI inicial 87.0909 -> plan «competir», defensor del título.
+- Mercado automático con T33 importado:
+  - 78 movimientos, 78 jugadores únicos.
+  - Infernus XI final 88.0909.
+  - Infernus: 5 salidas totales, 1 del núcleo original.
+  - Todas las 16 plantillas entre 18 y 25 jugadores.
+- Segundo mercado automático consecutivo sobre el mismo T33:
+  - línea base del campeón todavía 87.0909 (no reseteada)
+  - 94 movimientos totales, Infernus XI 88.3636.
+
+COMPATIBILIDAD
+- Save 5.4 existente no se reinicializa.
+- IndexedDB y la clave de emergencia local de VM 1.3.1 se conservan.
+- Service Worker: leagueforge-vm-v1-4-1, caché anterior sustituida.
+
+VERIFICACIÓN ESTÁTICA
+- Node JavaScript syntax: PASS
+- Service worker JavaScript syntax: PASS
+- Manifest JSON parse: PASS
+
+LIMITACIONES
+- La prueba automatizada fue sobre Chromium en el entorno de herramientas, no en Safari ni con la PWA instalada en iPhone.
+- No se ha forzado artificialmente que los campeones permanezcan en Primera: son ajustes de política de venta, no de resultados.
